@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb", "prettier"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "requireConfigFile": false,
+    "sourceType": "module"
+  },
+  "parser": "@babel/eslint-parser",
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "strict": ["error", "never"],
+    "react/jsx-uses-react": 2,
+    "react/jsx-uses-vars": 2,
+    "react/state-in-constructor": "off",
+    "no-unused-vars": "warn",
+    "no-unused-expressions": "warn",
+    "import/prefer-default-export": "off",
+    "max-classes-per-file": ["error", 2],
+    "no-lonely-if": "off",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-alert": "off"
+  }
+}
