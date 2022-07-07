@@ -15,6 +15,7 @@
   "parser": "@babel/eslint-parser",
   "plugins": ["react", "prettier"],
   "rules": {
+    "react/prop-types": 0,
     "strict": ["error", "never"],
     "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,
