@@ -2,29 +2,65 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { collection, query, onSnapshot, addDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  query,
+  onSnapshot,
+  getDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import styled from 'styled-components';
 import { db } from '../firebase';
-import { StyledButton } from '../components/styles/Button';
+import Button from '../components/styles/Button';
 import { MainWindow } from '../components/styles/MainWindow';
 import { StyledHeader } from '../components/styles/Texts';
 
-function Quiz() {
+function Quiz({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
+  const [currentScore, setCurrentScore] = useState(null);
+
+  const token = localStorage.getItem('group');
+
+  const logout = () => {
+    localStorage.removeItem('group');
+    history?.push('/');
+    window.location.assign('/');
+  };
 
   useEffect(() => {
+    if (!token) {
+      history?.push('/');
+      window.location.assign('/');
+    }
     const q = query(collection(db, 'questions'));
     onSnapshot(q, (querySnapshot) => {
-      setQuestions(querySnapshot.docs.map((doc) => doc.data()));
+      setQuestions(querySnapshot.docs.map((d) => d.data()));
     });
   }, []);
 
-  const handleAnswerOptionClick = (isCorrect) => {
+  const handleDoc = async () => {
+    const gs = doc(db, 'group', token);
+
+    const docSnap = await getDoc(gs);
+
+    if (docSnap.exists()) {
+      setCurrentScore(docSnap.data().score);
+    }
+  };
+
+  useEffect(() => {
+    handleDoc();
+  }, [currentQuestion, showScore]);
+
+  const handleAnswerOptionClick = async (isCorrect) => {
     if (isCorrect) {
       setScore(score + 1);
+      const group = doc(db, 'group', `${token}`);
+      await updateDoc(group, { score: score + 1 });
     }
 
     const nextQuestion = currentQuestion + 1;
@@ -48,12 +84,28 @@ function Quiz() {
   return (
     <MainWindow>
       {showScore ? (
-        <ScoreSection>
-          You scored {score} out of {questions.length}
-        </ScoreSection>
+        <>
+          <ScoreSection>
+            You scored {score} out of {questions.length}
+          </ScoreSection>
+          <Button
+            onClick={() => {
+              logout();
+            }}
+          >
+            Quitar
+          </Button>
+        </>
       ) : questions.length ? (
         <div>
           <QuestionSection>
+            <Button
+              onClick={() => {
+                logout();
+              }}
+            >
+              {currentScore}
+            </Button>
             <QuestionCount>
               <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
               {questions.length}
@@ -64,13 +116,13 @@ function Quiz() {
             <AnswerSection>
               {questions[currentQuestion].answerOptions?.map(
                 (answer, index) => (
-                  <StyledButton
+                  <Button
                     key={index}
                     type="button"
                     onClick={() => handleAnswerOptionClick(answer.isCorrect)}
                   >
                     {answer.answerText}
-                  </StyledButton>
+                  </Button>
                 )
               )}
             </AnswerSection>

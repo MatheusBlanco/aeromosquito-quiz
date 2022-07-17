@@ -16,7 +16,7 @@ function TextInput({
     <div
       style={{ display: 'flex', flexDirection: 'column', ...containerStyle }}
     >
-      <span>{label}</span>
+      <span style={{ margin: 5 }}>{label}</span>
 
       <div
         style={{
@@ -40,7 +40,17 @@ function TextInput({
 }
 
 const StyledInput = styled.input`
-  background-color: #7cc6fe;
+  width: 100%;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #234668;
+  border-radius: 15px;
+  display: flex;
+  padding: 5px;
+  justify-content: flex-start;
+  align-items: center;
+  border: 5px solid #234668;
+  cursor: pointer;
 `;
 
 export default TextInput;

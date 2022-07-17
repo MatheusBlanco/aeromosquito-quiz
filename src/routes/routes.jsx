@@ -7,7 +7,7 @@ function Router() {
   return (
     <Routes>
       <Route path="/" element={<LogAsGroup />} />
-      <Route path="/quiz" element={<Quiz />} />
+      <Route path="/quiz/:groupId" element={<Quiz />} />
     </Routes>
   );
 }
