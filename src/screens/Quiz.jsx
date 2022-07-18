@@ -54,7 +54,7 @@ function Quiz({ history }) {
 
   useEffect(() => {
     handleDoc();
-  }, [currentQuestion, showScore]);
+  }, []);
 
   const handleAnswerOptionClick = async (isCorrect) => {
     if (isCorrect) {

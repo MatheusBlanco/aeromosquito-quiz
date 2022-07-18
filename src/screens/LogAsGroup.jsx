@@ -40,7 +40,7 @@ function LogAsGroup({ history }) {
   return (
     <MainWindow windowStyle={{ display: 'flex', flexDirection: 'row' }}>
       <div windowStyle={{ display: 'flex', flexDirection: 'row' }}>
-        <StyledHeader>lol</StyledHeader>
+        <StyledHeader>Criar grupo</StyledHeader>
         <TextInput
           label="Nome do Grupo"
           value={groupName}
@@ -52,6 +52,15 @@ function LogAsGroup({ history }) {
           onClick={() => handleCreateGroup(groupName)}
         >
           Criar grupo
+        </Button>
+        <Button
+          style={{ marginTop: 20 }}
+          onClick={() => {
+            history?.push(`/dash`);
+            window.location.assign(`/dash`);
+          }}
+        >
+          Ir para o dash
         </Button>
       </div>
     </MainWindow>
