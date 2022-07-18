@@ -12,9 +12,9 @@ import {
 } from 'firebase/firestore';
 import styled from 'styled-components';
 import { db } from '../firebase';
-import Button from '../components/styles/Button';
-import { MainWindow } from '../components/styles/MainWindow';
-import { StyledHeader } from '../components/styles/Texts';
+import Button from '../components/Button';
+import { MainWindow } from '../components/MainWindow';
+import { StyledHeader } from '../components/Texts';
 
 function Quiz({ history }) {
   const [questions, setQuestions] = useState([]);
@@ -127,10 +127,6 @@ function Quiz({ history }) {
               )}
             </AnswerSection>
           </QuestionSection>
-
-          {/* <button type="button" onClick={() => handleCreateData()}>
-            create
-          </button> */}
         </div>
       ) : null}
     </MainWindow>
