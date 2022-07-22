@@ -28,6 +28,7 @@ function GroupAnswering({ history }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
+  const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
 
   const token = localStorage.getItem('group');
@@ -84,6 +85,7 @@ function GroupAnswering({ history }) {
     const querySnapshot = await getDocs(m);
     if (isCorrect) {
       setScore(score + 1);
+      setMessage('O miserável é um gênio. Espera a outra pessoa');
       const g = doc(db, 'group', `${token}`);
       await updateDoc(g, { score: score + 1 });
 
@@ -91,6 +93,7 @@ function GroupAnswering({ history }) {
         updateDocuments(document, true);
       });
     } else {
+      setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
       querySnapshot.forEach((document) => {
         updateDocuments(document, false);
       });
@@ -109,18 +112,14 @@ function GroupAnswering({ history }) {
 
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
 
-          const nextQuestion = matchCurrentQuestion - 1;
-
-          if (nextQuestion < questions.length + 1) {
-            setCurrentQuestion(matchCurrentQuestion - 1);
-          } else {
-            setShowScore(true);
-          }
+          setCurrentQuestion(matchCurrentQuestion - 1);
+          setMessage(null);
         }
       });
     });
   };
 
+  console.log(currentQuestion);
   return (
     <MainWindow>
       {showScore ? (
@@ -148,26 +147,33 @@ function GroupAnswering({ history }) {
             >
               Quitar
             </Button>
-            <QuestionCount>
-              <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
-              {questions.length}
-            </QuestionCount>
-            <CurrentQuestion>
-              {questions[currentQuestion].questionText}
-            </CurrentQuestion>
-            <AnswerSection>
-              {questions[currentQuestion].answerOptions?.map(
-                (answer, index) => (
-                  <Button
-                    key={index}
-                    type="button"
-                    onClick={() => handleAnswerOptionClick(answer.isCorrect)}
-                  >
-                    {answer.answerText}
-                  </Button>
-                )
-              )}
-            </AnswerSection>
+            {currentQuestion < questions.length ? (
+              <div>
+                <QuestionCount>
+                  <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
+                  {questions.length}
+                </QuestionCount>
+                <CurrentQuestion>
+                  {questions[currentQuestion].questionText}
+                </CurrentQuestion>
+                <AnswerSection>
+                  {questions[currentQuestion].answerOptions?.map(
+                    (answer, index) => (
+                      <Button
+                        key={index}
+                        type="button"
+                        onClick={() =>
+                          handleAnswerOptionClick(answer.isCorrect)
+                        }
+                      >
+                        {answer.answerText}
+                      </Button>
+                    )
+                  )}
+                </AnswerSection>
+                <p>{message}</p>
+              </div>
+            ) : null}
           </QuestionSection>
         </div>
       ) : null}

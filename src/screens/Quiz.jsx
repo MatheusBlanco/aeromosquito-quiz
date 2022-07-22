@@ -33,6 +33,9 @@ function Quiz({ history }) {
 
     onSnapshot(m, (querySnapshot) => {
       setMatch(querySnapshot.docs.map((d) => d.data())[0]);
+      setCurrentQuestion(
+        querySnapshot.docs.map((d) => d.data())[0].currentQuestion
+      );
     });
   };
 
@@ -50,21 +53,6 @@ function Quiz({ history }) {
       setQuestions(querySnapshot.docs.map((d) => d.data()));
     });
   }, []);
-
-  const handleAnswerOptionClick = async (isCorrect) => {
-    if (isCorrect) {
-      setScore(score + 1);
-      const group = doc(db, 'group', `${token}`);
-      await updateDoc(group, { score: score + 1 });
-    }
-
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-    } else {
-      setShowScore(true);
-    }
-  };
 
   return (
     <MainWindow>
@@ -99,27 +87,17 @@ function Quiz({ history }) {
             >
               Quitar
             </Button>
-            <QuestionCount>
-              <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
-              {questions.length}
-            </QuestionCount>
-            <CurrentQuestion>
-              {questions[currentQuestion].questionText}
-            </CurrentQuestion>
-            <AnswerSection>
-              {questions[currentQuestion].answerOptions?.map(
-                (answer, index) => (
-                  <Button
-                    key={index}
-                    type="button"
-                    disabled
-                    onClick={() => handleAnswerOptionClick(answer.isCorrect)}
-                  >
-                    {answer.answerText}
-                  </Button>
-                )
-              )}
-            </AnswerSection>
+            {currentQuestion <= questions.length ? (
+              <>
+                <QuestionCount>
+                  <StyledHeader>Question {currentQuestion}</StyledHeader>/
+                  {questions.length}
+                </QuestionCount>
+                <CurrentQuestion>
+                  {questions[currentQuestion - 1].questionText}
+                </CurrentQuestion>
+              </>
+            ) : null}
           </QuestionSection>
         </div>
       ) : null}

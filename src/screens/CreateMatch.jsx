@@ -19,7 +19,6 @@ function CreateMatch({ history }) {
       id: uuidv4(),
       cod: matchCode,
       groups: [],
-      canProceed: false,
       currentQuestion: 1,
       questionLength,
     });
