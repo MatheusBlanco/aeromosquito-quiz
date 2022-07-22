@@ -121,8 +121,6 @@ function GroupAnswering({ history }) {
     });
   };
 
-  console.log(currentQuestion);
-
   return (
     <MainWindow>
       {showScore ? (
