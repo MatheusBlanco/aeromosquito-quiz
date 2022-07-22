@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-multi-assign */
 /* eslint-disable array-callback-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/no-array-index-key */
@@ -75,38 +77,51 @@ function GroupAnswering({ history }) {
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
+    const m = query(
+      collection(db, 'match'),
+      where('cod', '==', window.location.href.split('/')[5])
+    );
+    const querySnapshot = await getDocs(m);
     if (isCorrect) {
       setScore(score + 1);
       const g = doc(db, 'group', `${token}`);
       await updateDoc(g, { score: score + 1 });
-      const m = query(
-        collection(db, 'match'),
-        where('cod', '==', window.location.href.split('/')[5])
-      );
 
-      const querySnapshot = await getDocs(m);
       querySnapshot.forEach((document) => {
         updateDocuments(document, true);
       });
     } else {
-      const m = query(
-        collection(db, 'match'),
-        where('cod', '==', window.location.href.split('/')[5])
-      );
-
-      const querySnapshot = await getDocs(m);
       querySnapshot.forEach((document) => {
         updateDocuments(document, false);
       });
     }
 
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-    } else {
-      setShowScore(true);
-    }
+    let matchCurrentQuestion;
+    onSnapshot(m, (qs) => {
+      qs.docs.forEach(async (d) => {
+        if (
+          d.data()?.groups[1]?.questionsAnswered ===
+            d?.data()?.currentQuestion &&
+          d.data()?.groups[0]?.questionsAnswered === d.data()?.currentQuestion
+        ) {
+          matchCurrentQuestion = d.data().currentQuestion += 1;
+          const documentRef = doc(db, 'match', d.id);
+
+          await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
+
+          const nextQuestion = matchCurrentQuestion - 1;
+
+          if (nextQuestion < questions.length + 1) {
+            setCurrentQuestion(matchCurrentQuestion - 1);
+          } else {
+            setShowScore(true);
+          }
+        }
+      });
+    });
   };
+
+  console.log(currentQuestion);
 
   return (
     <MainWindow>
