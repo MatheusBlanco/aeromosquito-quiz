@@ -107,13 +107,17 @@ function Select({
               discreet={discreet}
               onClick={() => {
                 if (complex) {
-                  handleOptionClick(option?.id, option.groupName, index);
+                  handleOptionClick(
+                    option?.cod || option?.id,
+                    option?.groupName || option?.cod,
+                    index
+                  );
                 } else {
                   handleOptionClick(option, false, index);
                 }
               }}
             >
-              {complex ? option?.groupName : option}
+              {complex ? option?.groupName || option?.cod : option}
             </StyledOption>
           ))}
         </StyledInputDiv>

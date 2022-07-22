@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, onSnapshot, query } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  where,
+  updateDoc,
+  getDocs,
+  doc,
+  query,
+  arrayUnion,
+} from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
@@ -10,89 +20,108 @@ import Select from '../components/Select';
 
 function LogAsGroup({ history }) {
   const [groupName, setGroupName] = useState('');
-  const [groups, setGroups] = useState();
-  const [selectedGroup, setSelectedGroup] = useState();
+  const [matches, setmatches] = useState();
 
-  const token = localStorage.getItem('group');
-  const handleGroups = async () => {
-    const g = query(collection(db, 'group'));
-    onSnapshot(g, (querySnapshot) => {
-      setGroups(querySnapshot.docs.map((d) => d.data()));
+  const [selectedMatch, setselectedMatch] = useState();
+
+  const handleMatches = async () => {
+    const m = query(collection(db, 'match'));
+    onSnapshot(m, (querySnapshot) => {
+      setmatches(querySnapshot.docs.map((d) => d.data()));
     });
   };
 
   const handleEffect = () => {
-    if (token) {
-      history?.push(`/quiz/${token}`);
-      window.location.assign(`/quiz/${token}`);
-    } else {
-      handleGroups();
-    }
+    handleMatches();
   };
   useEffect(() => {
     handleEffect();
   }, []);
 
-  const handleLogAsGroup = (e) => {
-    setSelectedGroup(e);
-    localStorage.setItem('group', e);
-    history?.push(`/quiz/${e}`);
-    window.location.assign(`/quiz/${e}`);
-  };
-
-  const handleCreateGroup = (name) => {
+  const handleCreateGroup = async (name) => {
     const group = collection(db, 'group');
-    addDoc(group, {
+    const createdId = await addDoc(group, {
       groupName: name,
       score: 0,
       id: uuidv4(),
     })
-      .then((res) => {
-        localStorage.setItem('group', res.id);
-        history?.push(`/quiz/${res.id}`);
-        window.location.assign(`/quiz/${res.id}`);
-      })
+      .then((res) => res.id)
       .catch((e) => {
         alert('Não foi possível criar o grupo', e);
       });
+    return createdId;
+  };
+
+  const updateDocuments = async (document, name, groupId) => {
+    const documentRef = doc(db, 'match', document.id);
+
+    await updateDoc(
+      documentRef,
+      'groups',
+      arrayUnion({
+        groupName: name,
+        groupId,
+        score: 0,
+        questionsAnswered: 0,
+      })
+    );
+  };
+
+  const updateMatchWithGroup = async (name, match, groupId) => {
+    const q = query(collection(db, 'match'), where('cod', '==', match));
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((document) => {
+      updateDocuments(document, name, groupId);
+    });
+  };
+
+  const handleLogAsGroup = async (name, match) => {
+    const groupId = await handleCreateGroup(name);
+    await updateMatchWithGroup(name, match, groupId);
+    localStorage.setItem('group', groupId);
+    history?.push(`/quiz/group/${match}`);
+    window.location.assign(`/quiz/group/${match}`);
   };
 
   return (
-    <MainWindow style={{ display: 'flex', flexDirection: 'row' }}>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <StyledHeader>Criar grupo</StyledHeader>
-        <TextInput
-          label="Nome do Grupo"
-          value={groupName}
-          onTextChange={(value) => setGroupName(value)}
-          type="text"
-        />
-        <Button
-          style={{ marginTop: 20 }}
-          onClick={() => handleCreateGroup(groupName)}
-        >
-          Criar grupo
-        </Button>
-        <Button
-          style={{ marginTop: 20 }}
-          onClick={() => {
-            history?.push(`/dash`);
-            window.location.assign(`/dash`);
-          }}
-        >
-          Ir para o dash
-        </Button>
-        <Select
-          selectedOption={
-            groups?.find((group) => group?.name === selectedGroup?.name)?.name
-          }
-          options={groups}
-          discreet
-          complex
-          selectstyle={{ width: 359 }}
-          onOptionClick={(e) => handleLogAsGroup(e)}
-        />
-      </div>
+    <MainWindow style={{ display: 'flex', flexDirection: 'column' }}>
+      <StyledHeader>Criar grupo</StyledHeader>
+      <TextInput
+        label="Nome do Grupo"
+        value={groupName}
+        onTextChange={(value) => setGroupName(value)}
+        type="text"
+      />
+
+      <StyledHeader>Selecionar partida</StyledHeader>
+      <Select
+        selectedOption={
+          matches?.find((match) => match?.cod === selectedMatch?.cod)?.cod
+        }
+        options={matches}
+        discreet
+        complex
+        selectstyle={{ width: 359 }}
+        onOptionClick={(e) => setselectedMatch(e)}
+      />
+      <Button
+        style={{ marginTop: 20 }}
+        onClick={() => handleLogAsGroup(groupName, selectedMatch)}
+      >
+        Conectar com partida
+      </Button>
+
+      <Button
+        style={{ marginTop: 20 }}
+        onClick={() => {
+          history?.push(`/dash`);
+          window.location.assign(`/dash`);
+        }}
+      >
+        Ir para o dash
+      </Button>
     </MainWindow>
   );
 }

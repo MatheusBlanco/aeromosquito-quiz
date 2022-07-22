@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable prefer-destructuring */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
@@ -6,7 +8,10 @@ import {
   collection,
   doc,
   query,
+  arrayUnion,
+  arrayRemove,
   onSnapshot,
+  getDocs,
   where,
   updateDoc,
 } from 'firebase/firestore';
@@ -16,7 +21,7 @@ import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
 
-function Quiz({ history }) {
+function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
@@ -28,11 +33,12 @@ function Quiz({ history }) {
   const handleMatchInfo = async () => {
     const m = query(
       collection(db, 'match'),
-      where('cod', '==', window.location.href.split('/')[4])
+      where('cod', '==', window.location.href.split('/')[5])
     );
 
-    onSnapshot(m, (querySnapshot) => {
-      setMatch(querySnapshot.docs.map((d) => d.data())[0]);
+    onSnapshot(m, (qs) => {
+      setMatch(qs.docs.map((d) => d.data())[0]);
+      return qs.docs.map((d) => d.data())[0];
     });
   };
 
@@ -43,7 +49,6 @@ function Quiz({ history }) {
   };
 
   useEffect(() => {
-    // handleGroups();
     handleMatchInfo();
     const q = query(collection(db, 'questions'));
     onSnapshot(q, (querySnapshot) => {
@@ -51,11 +56,48 @@ function Quiz({ history }) {
     });
   }, []);
 
+  const updateDocuments = async (document, correct) => {
+    const documentRef = doc(db, 'match', document.id);
+    const currentgroup = document
+      .data()
+      .groups.find((g) => g.groupId === token);
+
+    await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
+
+    if (correct === true) {
+      currentgroup.score += 1;
+      currentgroup.questionsAnswered += 1;
+    } else if (correct === false) {
+      currentgroup.questionsAnswered += 1;
+    }
+
+    await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
+  };
+
   const handleAnswerOptionClick = async (isCorrect) => {
     if (isCorrect) {
       setScore(score + 1);
-      const group = doc(db, 'group', `${token}`);
-      await updateDoc(group, { score: score + 1 });
+      const g = doc(db, 'group', `${token}`);
+      await updateDoc(g, { score: score + 1 });
+      const m = query(
+        collection(db, 'match'),
+        where('cod', '==', window.location.href.split('/')[5])
+      );
+
+      const querySnapshot = await getDocs(m);
+      querySnapshot.forEach((document) => {
+        updateDocuments(document, true);
+      });
+    } else {
+      const m = query(
+        collection(db, 'match'),
+        where('cod', '==', window.location.href.split('/')[5])
+      );
+
+      const querySnapshot = await getDocs(m);
+      querySnapshot.forEach((document) => {
+        updateDocuments(document, false);
+      });
     }
 
     const nextQuestion = currentQuestion + 1;
@@ -84,13 +126,7 @@ function Quiz({ history }) {
       ) : questions.length ? (
         <div>
           <StyledHeader>{match?.cod}</StyledHeader>
-          <ul>
-            {match?.groups.map((group) => (
-              <li>
-                {group.groupName} - {group.score} pontos
-              </li>
-            ))}
-          </ul>
+
           <QuestionSection>
             <Button
               onClick={() => {
@@ -112,7 +148,6 @@ function Quiz({ history }) {
                   <Button
                     key={index}
                     type="button"
-                    disabled
                     onClick={() => handleAnswerOptionClick(answer.isCorrect)}
                   >
                     {answer.answerText}
@@ -153,4 +188,4 @@ const AnswerSection = styled.div`
   justify-content: space-between;
 `;
 
-export default Quiz;
+export default GroupAnswering;
