@@ -1,9 +1,6 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 import {
@@ -26,7 +23,6 @@ import { StyledHeader } from '../components/Texts';
 function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
@@ -121,7 +117,7 @@ function GroupAnswering({ history }) {
 
   return (
     <MainWindow>
-      {showScore ? (
+      {/* {showScore ? (
         <>
           <ScoreSection>
             You scored {score} out of {questions.length}
@@ -134,57 +130,55 @@ function GroupAnswering({ history }) {
             Quitar
           </Button>
         </>
-      ) : questions.length ? (
-        <div>
-          <StyledHeader>{match?.cod}</StyledHeader>
+      ) : questions.length ? ( */}
+      <div>
+        <StyledHeader>{match?.cod}</StyledHeader>
 
-          <QuestionSection>
-            <Button
-              onClick={() => {
-                logout();
-              }}
-            >
-              Quitar
-            </Button>
-            {currentQuestion < questions.length ? (
-              <div>
-                <QuestionCount>
-                  <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
-                  {questions.length}
-                </QuestionCount>
-                <CurrentQuestion>
-                  {questions[currentQuestion].questionText}
-                </CurrentQuestion>
-                <AnswerSection>
-                  {questions[currentQuestion].answerOptions?.map(
-                    (answer, index) => (
-                      <Button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          handleAnswerOptionClick(answer.isCorrect)
-                        }
-                      >
-                        {answer.answerText}
-                      </Button>
-                    )
-                  )}
-                </AnswerSection>
-                <p>{message}</p>
-              </div>
-            ) : null}
-          </QuestionSection>
-        </div>
-      ) : null}
+        <QuestionSection>
+          <Button
+            onClick={() => {
+              logout();
+            }}
+          >
+            Quitar
+          </Button>
+          {currentQuestion < questions.length ? (
+            <div>
+              <QuestionCount>
+                <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
+                {questions.length}
+              </QuestionCount>
+              <CurrentQuestion>
+                {questions[currentQuestion].questionText}
+              </CurrentQuestion>
+              <AnswerSection>
+                {questions[currentQuestion].answerOptions?.map(
+                  (answer, index) => (
+                    <Button
+                      key={index}
+                      type="button"
+                      onClick={() => handleAnswerOptionClick(answer.isCorrect)}
+                    >
+                      {answer.answerText}
+                    </Button>
+                  )
+                )}
+              </AnswerSection>
+              <p>{message}</p>
+            </div>
+          ) : null}
+        </QuestionSection>
+      </div>
+      {/* ) : null} */}
     </MainWindow>
   );
 }
 
-const ScoreSection = styled.div`
-  display: flex;
-  font-size: 24px;
-  align-items: center;
-`;
+// const ScoreSection = styled.div`
+//   display: flex;
+//   font-size: 24px;
+//   align-items: center;
+// `;
 
 const QuestionSection = styled.div`
   width: 100%;
