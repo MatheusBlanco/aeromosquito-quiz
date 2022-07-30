@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 
 export const MainWindow = styled.div`
-  background-color: #252d4a;
-  min-width: 500px;
+  background-color: #729b46;
   width: 100%;
   min-height: 200px;
   height: min-content;

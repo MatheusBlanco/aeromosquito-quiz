@@ -12,11 +12,14 @@ body {
 }
 
 body {
-  background-color: #7cc6fe;
+  background-color: #f7f7f7;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  background-image: url('assets/images/Logo.jpeg');
+  background-repeat: no-repeat;
+  background-size: 399px 305px;
 }
 
 .score-section {
@@ -44,7 +47,8 @@ body {
 }
 
 button:hover {
-  background-color: #555e7d;
+  background-color: #5d7740;
+  border: 2px solid #5d7740;
 }
 
 button:focus {

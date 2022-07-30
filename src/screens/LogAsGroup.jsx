@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react';
 import {
   collection,
@@ -16,13 +18,14 @@ import { MainWindow } from '../components/MainWindow';
 import TextInput from '../components/TextInput';
 import { StyledHeader } from '../components/Texts';
 import { db } from '../firebase';
-import Select from '../components/Select';
 
 function LogAsGroup({ history }) {
   const [groupName, setGroupName] = useState('');
   const [matches, setmatches] = useState();
+  const [matchCode, setMatchCode] = useState('');
+  const [matchCodeError, setMatchCodeError] = useState(false);
 
-  const [selectedMatch, setselectedMatch] = useState();
+  const [missingGroup, setMissingGroup] = useState(false);
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
@@ -31,11 +34,8 @@ function LogAsGroup({ history }) {
     });
   };
 
-  const handleEffect = () => {
-    handleMatches();
-  };
   useEffect(() => {
-    handleEffect();
+    handleMatches();
   }, []);
 
   const handleCreateGroup = async (name) => {
@@ -77,38 +77,58 @@ function LogAsGroup({ history }) {
     });
   };
 
+  const validateMatchCode = (code) =>
+    matches.find((match) => {
+      if (match.cod !== code.toUpperCase()) {
+        return false;
+      }
+      return true;
+    });
+
   const handleLogAsGroup = async (name, match) => {
-    const groupId = await handleCreateGroup(name);
-    await updateMatchWithGroup(name, match, groupId);
-    localStorage.setItem('group', groupId);
-    history?.push(`/quiz/group/${match}`);
-    window.location.assign(`/quiz/group/${match}`);
+    const error = validateMatchCode(match);
+    if (error === undefined) {
+      setMatchCodeError(true);
+    } else {
+      setMatchCodeError(false);
+      if (name.length === 0 || name.length < 6) {
+        setMissingGroup(true);
+      } else {
+        setMissingGroup(false);
+        const groupId = await handleCreateGroup(name);
+        await updateMatchWithGroup(name, match, groupId);
+        localStorage.setItem('group', groupId);
+        history?.push(`/quiz/group/${match}`);
+        window.location.assign(`/quiz/group/${match}`);
+      }
+    }
   };
 
   return (
     <MainWindow style={{ display: 'flex', flexDirection: 'column' }}>
-      <StyledHeader>Criar grupo</StyledHeader>
+      <StyledHeader>Iniciar jogo</StyledHeader>
       <TextInput
         label="Nome do Grupo"
         value={groupName}
         onTextChange={(value) => setGroupName(value)}
         type="text"
+        wrongData={missingGroup}
+        wrongDataMessage="Insira um nome de grupo válido"
       />
 
-      <StyledHeader>Selecionar partida</StyledHeader>
-      <Select
-        selectedOption={
-          matches?.find((match) => match?.cod === selectedMatch?.cod)?.cod
+      <TextInput
+        label="Inserir código da partida"
+        value={matchCode}
+        onTextChange={(value) => setMatchCode(value)}
+        wrongData={matchCodeError}
+        wrongDataMessage={
+          matchCodeError ? 'Código inexistente. Insira um código válido' : ''
         }
-        options={matches}
-        discreet
-        complex
-        selectstyle={{ width: 359 }}
-        onOptionClick={(e) => setselectedMatch(e)}
+        type="text"
       />
       <Button
         style={{ marginTop: 20 }}
-        onClick={() => handleLogAsGroup(groupName, selectedMatch)}
+        onClick={() => handleLogAsGroup(groupName, matchCode)}
       >
         Conectar com partida
       </Button>

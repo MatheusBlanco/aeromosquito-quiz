@@ -70,8 +70,8 @@ function Quiz({ history }) {
         <StyledHeader>{match?.cod}</StyledHeader>
         <ul>
           {match?.groups.map((group) => (
-            <li>
-              {group.groupName} - {group.score} pontos
+            <li key={group?.groupId}>
+              {group?.groupName} - {group?.score} pontos
             </li>
           ))}
         </ul>
@@ -83,14 +83,14 @@ function Quiz({ history }) {
           >
             Quitar
           </Button>
-          {currentQuestion <= questions.length ? (
+          {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>
                 <StyledHeader>Question {currentQuestion}</StyledHeader>/
-                {questions.length}
+                {questions?.length}
               </QuestionCount>
               <CurrentQuestion>
-                {questions[currentQuestion - 1].questionText}
+                {questions[currentQuestion - 1]?.questionText}
               </CurrentQuestion>
             </>
           ) : null}

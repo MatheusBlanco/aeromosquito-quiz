@@ -11,6 +11,8 @@ function TextInput({
   value,
   type,
   inputProps,
+  wrongData,
+  wrongDataMessage,
 }) {
   return (
     <div
@@ -21,7 +23,7 @@ function TextInput({
       <div
         style={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
           position: 'relative',
         }}
@@ -34,6 +36,13 @@ function TextInput({
           disabled={disabled === true}
           {...inputProps}
         />
+        {wrongData === true ? (
+          <span
+            style={{ alignSelf: 'flex-start', marginTop: 4, color: '#A82E2E' }}
+          >
+            {wrongDataMessage}
+          </span>
+        ) : null}
       </div>
     </div>
   );
@@ -43,14 +52,19 @@ const StyledInput = styled.input`
   width: 100%;
   font-size: 16px;
   color: #ffffff;
-  background-color: #234668;
-  border-radius: 15px;
+  background-color: transparent;
+  outline: 0;
+  border-width: 0 0 2px;
+  border-color: #34471f;
   display: flex;
   padding: 5px;
   justify-content: flex-start;
   align-items: center;
-  border: 5px solid #234668;
   cursor: pointer;
+
+  &:focus {
+    border-color: #5d7740;
+  }
 `;
 
 export default TextInput;
