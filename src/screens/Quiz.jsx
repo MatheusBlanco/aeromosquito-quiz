@@ -11,6 +11,7 @@ import {
   // updateDoc,
 } from 'firebase/firestore';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
@@ -20,6 +21,7 @@ function Quiz({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [match, setMatch] = useState(null);
+  const navigate = useNavigate();
 
   const handleMatchInfo = async () => {
     const m = query(
@@ -38,7 +40,7 @@ function Quiz({ history }) {
   const logout = () => {
     localStorage.removeItem('group');
     history?.push('/');
-    window.location.assign('/');
+    navigate('/');
   };
 
   useEffect(() => {

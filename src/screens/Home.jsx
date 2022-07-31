@@ -1,19 +1,21 @@
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
 
 function Home({ history }) {
+  const navigate = useNavigate();
   const handleLogAsGroup = async () => {
     history?.push(`/quiz/group`);
-    window.location.assign(`/quiz/group`);
+    navigate(`/quiz/group`);
   };
 
   const logAsAdmin = () => {
     history?.push('/admin');
-    window.location.assign('/admin');
+    navigate('/admin');
   };
 
   return (

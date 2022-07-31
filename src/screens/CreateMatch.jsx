@@ -9,7 +9,10 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { db, auth, logout } from '../firebase';
 import { MainWindow } from '../components/MainWindow';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -18,6 +21,8 @@ function CreateMatch({ history }) {
   const [matches, setmatches] = useState();
   const [matchCode, setMatchCode] = useState('');
   const [matchCodeError, setMatchCodeError] = useState(false);
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
 
   const createMatch = async () => {
     const questions = await query(collection(db, 'questions'));
@@ -34,13 +39,14 @@ function CreateMatch({ history }) {
       questionLength,
     });
     history?.push(`/quiz/${matchCodeId}`);
-    window.location.assign(`/quiz/${matchCodeId}`);
+    navigate(`/quiz/${matchCodeId}`);
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem('group');
     history?.push('/');
-    window.location.assign('/');
+    navigate('/');
+    if (user) logout();
   };
 
   const handleMatches = async () => {
@@ -63,13 +69,13 @@ function CreateMatch({ history }) {
     });
 
   const connectToExistingMatch = async (match) => {
-    const error = validateMatchCode(match);
-    if (error === undefined) {
+    const validationError = validateMatchCode(match);
+    if (validationError === undefined) {
       setMatchCodeError(true);
     } else {
       setMatchCodeError(false);
       history?.push(`/quiz/${match}`);
-      window.location.assign(`/quiz/${match}`);
+      navigate(`/quiz/${match}`);
     }
   };
 
@@ -101,11 +107,16 @@ function CreateMatch({ history }) {
       </Button>
       <Button
         onClick={() => {
-          logout();
+          handleLogout();
         }}
       >
-        Voltar à pagina inicial
+        Desconectar
       </Button>
+      {user ? (
+        <Button onClick={() => navigate('/newQuestions')}>
+          Página de criação de perguntas
+        </Button>
+      ) : null}
     </MainWindow>
   );
 }

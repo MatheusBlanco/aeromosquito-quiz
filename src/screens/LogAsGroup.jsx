@@ -13,6 +13,7 @@ import {
   arrayUnion,
 } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import TextInput from '../components/TextInput';
@@ -24,8 +25,9 @@ function LogAsGroup({ history }) {
   const [matches, setmatches] = useState();
   const [matchCode, setMatchCode] = useState('');
   const [matchCodeError, setMatchCodeError] = useState(false);
-
   const [missingGroup, setMissingGroup] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
@@ -99,7 +101,7 @@ function LogAsGroup({ history }) {
         await updateMatchWithGroup(name, match, groupId);
         localStorage.setItem('group', groupId);
         history?.push(`/quiz/group/${match}`);
-        window.location.assign(`/quiz/group/${match}`);
+        navigate(`/quiz/group/${match}`);
       }
     }
   };
@@ -137,7 +139,7 @@ function LogAsGroup({ history }) {
         style={{ marginTop: 20 }}
         onClick={() => {
           history?.push(`/dash`);
-          window.location.assign(`/dash`);
+          navigate(`/dash`);
         }}
       >
         Ir para o dash

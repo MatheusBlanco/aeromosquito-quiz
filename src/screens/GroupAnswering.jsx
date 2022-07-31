@@ -3,6 +3,7 @@
 /* eslint-disable no-multi-assign */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
+import { useNavigate } from 'react-router-dom';
 import {
   collection,
   doc,
@@ -26,6 +27,7 @@ function GroupAnswering({ history }) {
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem('group');
 
@@ -44,7 +46,7 @@ function GroupAnswering({ history }) {
   const logout = () => {
     localStorage.removeItem('group');
     history?.push('/');
-    window.location.assign('/');
+    navigate('/');
   };
 
   useEffect(() => {
