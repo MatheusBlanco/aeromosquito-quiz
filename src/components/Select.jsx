@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/no-array-index-key */
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
@@ -109,7 +110,7 @@ function Select({
                 if (complex) {
                   handleOptionClick(
                     option?.cod || option?.id,
-                    option?.groupName || option?.cod,
+                    option?.groupName || option?.cod || option?.answer,
                     index
                   );
                 } else {
@@ -117,7 +118,9 @@ function Select({
                 }
               }}
             >
-              {complex ? option?.groupName || option?.cod : option}
+              {complex
+                ? option?.groupName || option?.cod || option?.answer
+                : option}
             </StyledOption>
           ))}
         </StyledInputDiv>
@@ -130,13 +133,13 @@ const StyledSelect = styled.button`
   width: 100%;
   font-size: 16px;
   color: #ffffff;
-  background-color: #252d4a;
+  background-color: #34471f;
   border-radius: 15px;
   display: flex;
   padding: 5px;
   justify-content: flex-start;
   align-items: center;
-  border: 5px solid #234668;
+  border: 5px solid #34471f;
   cursor: pointer;
 `;
 

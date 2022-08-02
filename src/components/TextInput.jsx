@@ -18,7 +18,7 @@ function TextInput({
     <div
       style={{ display: 'flex', flexDirection: 'column', ...containerStyle }}
     >
-      <span style={{ margin: 5 }}>{label}</span>
+      <span style={{ margin: 5, fontWeight: 'bold' }}>{label}</span>
 
       <div
         style={{

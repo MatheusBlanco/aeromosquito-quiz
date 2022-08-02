@@ -134,16 +134,6 @@ function LogAsGroup({ history }) {
       >
         Conectar com partida
       </Button>
-
-      <Button
-        style={{ marginTop: 20 }}
-        onClick={() => {
-          history?.push(`/dash`);
-          navigate(`/dash`);
-        }}
-      >
-        Ir para o dash
-      </Button>
     </MainWindow>
   );
 }
