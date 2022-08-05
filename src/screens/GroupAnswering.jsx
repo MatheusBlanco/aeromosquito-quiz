@@ -96,18 +96,16 @@ function GroupAnswering({ history }) {
       await updateDoc(g, { score: score + 1 });
 
       querySnapshot.forEach(async (document) => {
-        await updateDocuments(document, true).then(() => {
-          setScore(score + 1);
-          setMessage('O miserável é um gênio. Espera a outra pessoa');
-          setLoading(false);
-        });
+        await updateDocuments(document, true);
+        setScore(score + 1);
+        setMessage('O miserável é um gênio. Espera a outra pessoa');
+        setLoading(false);
       });
     } else {
       querySnapshot.forEach(async (document) => {
-        await updateDocuments(document, false).then(() => {
-          setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
-          setLoading(false);
-        });
+        await updateDocuments(document, false);
+        setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
+        setLoading(false);
       });
     }
 

@@ -32,7 +32,7 @@ function LogAsGroup({ history }) {
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
-    return onSnapshot(m, (querySnapshot) => {
+    onSnapshot(m, (querySnapshot) => {
       console.log(querySnapshot.docs.map((d) => d.data()));
       setmatches(querySnapshot.docs.map((d) => d.data()));
     });
@@ -59,7 +59,7 @@ function LogAsGroup({ history }) {
   const updateDocuments = async (document, name, groupId) => {
     const documentRef = doc(db, 'match', document.id);
 
-    return updateDoc(
+    await updateDoc(
       documentRef,
       'groups',
       arrayUnion({
@@ -76,13 +76,9 @@ function LogAsGroup({ history }) {
 
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.forEach(async (document) => {
-      await updateDocuments(document, name, groupId).then((res) => {
-        console.log(res);
-        localStorage.setItem('group', groupId);
-        history?.push(`/quiz/group/${match}`);
-        navigate(`/quiz/group/${match}`);
-      });
+    querySnapshot.forEach(async (document) => {
+      await updateDocuments(document, name, groupId);
+      console.log('atualizou');
     });
   };
 
@@ -107,6 +103,9 @@ function LogAsGroup({ history }) {
         setMissingGroup(false);
         const groupId = await handleCreateGroup(name);
         await updateMatchWithGroup(name, match, groupId);
+        localStorage.setItem('group', groupId);
+        history?.push(`/quiz/group/${match}`);
+        navigate(`/quiz/group/${match}`);
       }
     }
     setLoading(false);
@@ -127,7 +126,7 @@ function LogAsGroup({ history }) {
       <TextInput
         label="Inserir código da partida"
         value={matchCode}
-        onTextChange={(value) => setMatchCode(value)}
+        onTextChange={(value) => setMatchCode(value.toUpperCase())}
         wrongData={matchCodeError}
         wrongDataMessage={
           matchCodeError ? 'Código inexistente. Insira um código válido' : ''
