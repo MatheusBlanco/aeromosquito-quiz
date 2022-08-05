@@ -33,15 +33,13 @@ function Home({ history }) {
         <Button
           style={{ padding: 10, fontSize: 28, fontWeight: 'bold' }}
           onClick={() => logAsAdmin()}
-        >
-          Sou organizador!
-        </Button>{' '}
+          child="Sou organizador"
+        />{' '}
         <Button
           style={{ padding: 10, fontSize: 28, fontWeight: 'bold' }}
           onClick={() => handleLogAsGroup()}
-        >
-          Sou campista!
-        </Button>
+          child="Sou campista"
+        />
       </div>
     </MainWindow>
   );

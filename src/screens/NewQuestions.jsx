@@ -26,6 +26,7 @@ function NewQuestions() {
   const [alternative4, setAlternative4] = useState('');
   const [alternatives, setAlternatives] = useState([]);
   const [correctAlternative, setCorrectAlternative] = useState();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleExistingQuestions = async () => {
@@ -93,7 +94,8 @@ function NewQuestions() {
   };
 
   const sendDataToFirebase = async () => {
-    newQuestionList.forEach((entry) => {
+    setLoading(true);
+    newQuestionList.forEach(async (entry) => {
       const match = collection(db, 'questions');
       return addDoc(match, {
         questionText: entry.questionText,
@@ -101,6 +103,7 @@ function NewQuestions() {
       });
     });
     setModal(false);
+    setLoading(false);
   };
 
   const modalContent = () => {
@@ -114,9 +117,10 @@ function NewQuestions() {
               onTextChange={(value) => setNewQuestion(value)}
             />
             {newQuestion.length > 10 ? (
-              <Button onClick={() => setModalState('alternatives')}>
-                Continuar
-              </Button>
+              <Button
+                onClick={() => setModalState('alternatives')}
+                child="Continuar"
+              />
             ) : null}
           </StyledCreation>
         );
@@ -149,6 +153,7 @@ function NewQuestions() {
             alternative3.length > 0 &&
             alternative4.length > 0 ? (
               <Button
+                child="Continuar"
                 onClick={() =>
                   handleAlternativesArray(
                     alternative1,
@@ -157,9 +162,7 @@ function NewQuestions() {
                     alternative4
                   )
                 }
-              >
-                Continuar
-              </Button>
+              />
             ) : null}
           </StyledCreation>
         );
@@ -179,7 +182,7 @@ function NewQuestions() {
               onOptionClick={(option) => setCorrectAlternative(option)}
               defaultPlaceholder="Alternativas"
             />
-            <Button onClick={() => handleAddToArray()}>Confirmar</Button>
+            <Button onClick={() => handleAddToArray()} child="Confirmar" />
           </StyledCreation>
         );
       default:
@@ -201,9 +204,8 @@ function NewQuestions() {
             onClick={() => {
               setModal(true);
             }}
-          >
-            Criar novas perguntas
-          </Button>
+            child="Criar novas perguntas"
+          />
         </div>
       </MainWindow>
       <Modal
@@ -230,9 +232,9 @@ function NewQuestions() {
             onClick={() => {
               sendDataToFirebase();
             }}
-          >
-            Finalizar
-          </Button>
+            child="Finalizar"
+            loading={loading}
+          />
         </div>
       </Modal>
     </>

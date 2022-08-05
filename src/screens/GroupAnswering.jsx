@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
@@ -27,6 +28,7 @@ function GroupAnswering({ history }) {
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('group');
@@ -68,7 +70,7 @@ function GroupAnswering({ history }) {
     if (correct === true) {
       currentgroup.score += 1;
       currentgroup.questionsAnswered += 1;
-    } else if (correct === false) {
+    } else {
       currentgroup.questionsAnswered += 1;
     }
 
@@ -76,6 +78,7 @@ function GroupAnswering({ history }) {
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
+    setLoading(true);
     const m = query(
       collection(db, 'match'),
       where('cod', '==', window.location.href.split('/')[5])
@@ -87,15 +90,16 @@ function GroupAnswering({ history }) {
       const g = doc(db, 'group', `${token}`);
       await updateDoc(g, { score: score + 1 });
 
-      querySnapshot.forEach((document) => {
-        updateDocuments(document, true);
+      querySnapshot.forEach(async (document) => {
+        await updateDocuments(document, true);
       });
     } else {
       setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
-      querySnapshot.forEach((document) => {
-        updateDocuments(document, false);
+      querySnapshot.forEach(async (document) => {
+        await updateDocuments(document, false);
       });
     }
+    setLoading(false);
 
     let matchCurrentQuestion;
     onSnapshot(m, (qs) => {
@@ -119,20 +123,6 @@ function GroupAnswering({ history }) {
 
   return (
     <MainWindow>
-      {/* {showScore ? (
-        <>
-          <ScoreSection>
-            You scored {score} out of {questions.length}
-          </ScoreSection>
-          <Button
-            onClick={() => {
-              logout();
-            }}
-          >
-            Quitar
-          </Button>
-        </>
-      ) : questions.length ? ( */}
       <div>
         <StyledHeader>{match?.cod}</StyledHeader>
 
@@ -141,9 +131,8 @@ function GroupAnswering({ history }) {
             onClick={() => {
               logout();
             }}
-          >
-            Quitar
-          </Button>
+            child="Desconectar"
+          />
           {currentQuestion < questions.length ? (
             <div>
               <QuestionCount>
@@ -154,19 +143,25 @@ function GroupAnswering({ history }) {
                 {questions[currentQuestion].questionText}
               </CurrentQuestion>
               <AnswerSection>
-                {questions[currentQuestion].answerOptions?.map(
-                  (answer, index) => (
-                    <Button
-                      key={index}
-                      type="button"
-                      onClick={() => handleAnswerOptionClick(answer.isCorrect)}
-                    >
-                      {answer.answerText}
-                    </Button>
+                {!message ? (
+                  questions[currentQuestion].answerOptions?.map(
+                    (answer, index) => (
+                      <Button
+                        key={index}
+                        type="button"
+                        child={answer.answerText}
+                        onClick={() =>
+                          handleAnswerOptionClick(answer.isCorrect)
+                        }
+                      />
+                    )
                   )
+                ) : !loading ? (
+                  <p>{message}</p>
+                ) : (
+                  <p>Cadastrando resposta...</p>
                 )}
               </AnswerSection>
-              <p>{message}</p>
             </div>
           ) : null}
         </QuestionSection>

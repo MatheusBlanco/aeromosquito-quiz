@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, signInWithGoogle } from '../firebase';
@@ -10,17 +10,19 @@ function Login() {
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) {
-      // maybe trigger a loading screen
       return;
     }
     if (user) navigate('/dash');
   }, [user, loading]);
+
   return (
     <MainWindow>
       <div>
-        <Button type="button" onClick={signInWithGoogle}>
-          Logar com Google
-        </Button>
+        <Button
+          type="button"
+          onClick={signInWithGoogle}
+          child="Logar com Google"
+        />
       </div>
     </MainWindow>
   );

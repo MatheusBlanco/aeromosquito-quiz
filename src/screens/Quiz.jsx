@@ -2,14 +2,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import {
-  collection,
-  // doc,
-  query,
-  onSnapshot,
-  where,
-  // updateDoc,
-} from 'firebase/firestore';
+import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
@@ -43,31 +36,20 @@ function Quiz({ history }) {
     navigate('/');
   };
 
-  useEffect(() => {
-    // handleGroups();
-    handleMatchInfo();
+  const handleQuestions = async () => {
     const q = query(collection(db, 'questions'));
-    onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, async (querySnapshot) => {
       setQuestions(querySnapshot.docs.map((d) => d.data()));
     });
+  };
+
+  useEffect(() => {
+    handleMatchInfo();
+    handleQuestions();
   }, []);
 
   return (
     <MainWindow>
-      {/* {showScore ? (
-        <>
-          <ScoreSection>
-            You scored {score} out of {questions.length}
-          </ScoreSection>
-          <Button
-            onClick={() => {
-              logout();
-            }}
-          >
-            Quitar
-          </Button>
-        </>
-      ) : questions.length ? ( */}
       <div>
         <StyledHeader>{match?.cod}</StyledHeader>
         <ul>
@@ -82,9 +64,8 @@ function Quiz({ history }) {
             onClick={() => {
               logout();
             }}
-          >
-            Quitar
-          </Button>
+            child="Desconectar"
+          />
           {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>

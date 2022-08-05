@@ -26,6 +26,7 @@ function LogAsGroup({ history }) {
   const [matchCode, setMatchCode] = useState('');
   const [matchCodeError, setMatchCodeError] = useState(false);
   const [missingGroup, setMissingGroup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -74,8 +75,8 @@ function LogAsGroup({ history }) {
 
     const querySnapshot = await getDocs(q);
 
-    querySnapshot.forEach((document) => {
-      updateDocuments(document, name, groupId);
+    querySnapshot.forEach(async (document) => {
+      await updateDocuments(document, name, groupId);
     });
   };
 
@@ -88,6 +89,7 @@ function LogAsGroup({ history }) {
     });
 
   const handleLogAsGroup = async (name, match) => {
+    setLoading(true);
     const error = validateMatchCode(match);
     if (error === undefined) {
       setMatchCodeError(true);
@@ -104,6 +106,7 @@ function LogAsGroup({ history }) {
         navigate(`/quiz/group/${match}`);
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -131,9 +134,9 @@ function LogAsGroup({ history }) {
       <Button
         style={{ marginTop: 20 }}
         onClick={() => handleLogAsGroup(groupName, matchCode)}
-      >
-        Conectar com partida
-      </Button>
+        child="Conectar com partida"
+        loading={loading}
+      />
     </MainWindow>
   );
 }

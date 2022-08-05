@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+import { Watch } from 'react-loader-spinner';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth, logout } from '../firebase';
@@ -21,10 +22,13 @@ function CreateMatch({ history }) {
   const [matches, setmatches] = useState();
   const [matchCode, setMatchCode] = useState('');
   const [matchCodeError, setMatchCodeError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [connectLoad, setConnectLoad] = useState(false);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
   const createMatch = async () => {
+    setLoading(true);
     const questions = await query(collection(db, 'questions'));
 
     const querySnapshot = await getDocs(questions);
@@ -40,6 +44,7 @@ function CreateMatch({ history }) {
     });
     history?.push(`/quiz/${matchCodeId}`);
     navigate(`/quiz/${matchCodeId}`);
+    setLoading(false);
   };
 
   const handleLogout = () => {
@@ -69,6 +74,7 @@ function CreateMatch({ history }) {
     });
 
   const connectToExistingMatch = async (match) => {
+    setConnectLoad(true);
     const validationError = validateMatchCode(match);
     if (validationError === undefined) {
       setMatchCodeError(true);
@@ -77,6 +83,7 @@ function CreateMatch({ history }) {
       history?.push(`/quiz/${match}`);
       navigate(`/quiz/${match}`);
     }
+    setConnectLoad(false);
   };
 
   return (
@@ -85,9 +92,9 @@ function CreateMatch({ history }) {
         onClick={() => {
           createMatch();
         }}
-      >
-        Criar partida
-      </Button>
+        loading={loading}
+        child="Criar partida"
+      />
 
       <TextInput
         label="Inserir código da partida"
@@ -102,20 +109,20 @@ function CreateMatch({ history }) {
       <Button
         style={{ marginTop: 20 }}
         onClick={() => connectToExistingMatch(matchCode)}
-      >
-        Conectar com partida
-      </Button>
+        child="Conectar com partida"
+        loading={connectLoad}
+      />
       <Button
         onClick={() => {
           handleLogout();
         }}
-      >
-        Desconectar
-      </Button>
+        child="Desconectar"
+      />
       {user ? (
-        <Button onClick={() => navigate('/newQuestions')}>
-          Página de criação de perguntas
-        </Button>
+        <Button
+          onClick={() => navigate('/newQuestions')}
+          child="Criação de perguntas"
+        />
       ) : null}
     </MainWindow>
   );
