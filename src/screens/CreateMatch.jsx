@@ -10,7 +10,6 @@ import {
 } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-import { Watch } from 'react-loader-spinner';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth, logout } from '../firebase';
