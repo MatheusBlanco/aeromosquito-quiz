@@ -29,7 +29,7 @@ function CreateMatch({ history }) {
   const createMatch = async () => {
     setLoading(true);
     const questions = await query(collection(db, 'questions'));
-
+    console.log('questões', questions);
     const querySnapshot = await getDocs(questions);
     const questionLength = querySnapshot.size;
     const matchCodeId = uuidv4().substring(0, 6).toUpperCase();
@@ -41,6 +41,7 @@ function CreateMatch({ history }) {
       currentQuestion: 1,
       questionLength,
     });
+    console.log('adicionou um doc para match');
     history?.push(`/quiz/${matchCodeId}`);
     navigate(`/quiz/${matchCodeId}`);
     setLoading(false);
@@ -55,6 +56,7 @@ function CreateMatch({ history }) {
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
+    console.log('query de matches', m);
     onSnapshot(m, (querySnapshot) => {
       setmatches(querySnapshot.docs.map((d) => d.data()));
     });

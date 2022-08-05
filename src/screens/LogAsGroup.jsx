@@ -32,7 +32,8 @@ function LogAsGroup({ history }) {
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
-    onSnapshot(m, (querySnapshot) => {
+    return onSnapshot(m, (querySnapshot) => {
+      console.log(querySnapshot.docs.map((d) => d.data()));
       setmatches(querySnapshot.docs.map((d) => d.data()));
     });
   };
@@ -58,7 +59,7 @@ function LogAsGroup({ history }) {
   const updateDocuments = async (document, name, groupId) => {
     const documentRef = doc(db, 'match', document.id);
 
-    await updateDoc(
+    return updateDoc(
       documentRef,
       'groups',
       arrayUnion({
@@ -75,8 +76,13 @@ function LogAsGroup({ history }) {
 
     const querySnapshot = await getDocs(q);
 
-    querySnapshot.forEach(async (document) => {
-      await updateDocuments(document, name, groupId);
+    return querySnapshot.forEach(async (document) => {
+      await updateDocuments(document, name, groupId).then((res) => {
+        console.log(res);
+        localStorage.setItem('group', groupId);
+        history?.push(`/quiz/group/${match}`);
+        navigate(`/quiz/group/${match}`);
+      });
     });
   };
 
@@ -101,9 +107,6 @@ function LogAsGroup({ history }) {
         setMissingGroup(false);
         const groupId = await handleCreateGroup(name);
         await updateMatchWithGroup(name, match, groupId);
-        localStorage.setItem('group', groupId);
-        history?.push(`/quiz/group/${match}`);
-        navigate(`/quiz/group/${match}`);
       }
     }
     setLoading(false);

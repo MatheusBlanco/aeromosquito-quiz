@@ -102,6 +102,7 @@ function NewQuestions() {
         answerOptions: entry.answerOptions,
       });
     });
+    console.log('yes yes');
     setModal(false);
     setLoading(false);
   };

@@ -38,6 +38,7 @@ function GroupAnswering({ history }) {
       collection(db, 'match'),
       where('cod', '==', window.location.href.split('/')[5])
     );
+    console.log('query de match', m);
 
     onSnapshot(m, (qs) => {
       setMatch(qs.docs.map((d) => d.data())[0]);
@@ -54,18 +55,22 @@ function GroupAnswering({ history }) {
   useEffect(() => {
     handleMatchInfo();
     const q = query(collection(db, 'questions'));
+
     onSnapshot(q, (querySnapshot) => {
+      console.log(querySnapshot.docs.map((d) => d.data()));
       setQuestions(querySnapshot.docs.map((d) => d.data()));
     });
   }, []);
 
   const updateDocuments = async (document, correct) => {
     const documentRef = doc(db, 'match', document.id);
+    console.log('doc', documentRef);
     const currentgroup = document
       .data()
       .groups.find((g) => g.groupId === token);
 
     await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
+    console.log('doc atualizado');
 
     if (correct === true) {
       currentgroup.score += 1;
@@ -75,6 +80,7 @@ function GroupAnswering({ history }) {
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
+    console.log('doc atualizado');
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
@@ -84,26 +90,31 @@ function GroupAnswering({ history }) {
       where('cod', '==', window.location.href.split('/')[5])
     );
     const querySnapshot = await getDocs(m);
+    console.log('querySnapshot', querySnapshot);
     if (isCorrect) {
-      setScore(score + 1);
-      setMessage('O miserável é um gênio. Espera a outra pessoa');
       const g = doc(db, 'group', `${token}`);
       await updateDoc(g, { score: score + 1 });
 
       querySnapshot.forEach(async (document) => {
-        await updateDocuments(document, true);
+        await updateDocuments(document, true).then(() => {
+          setScore(score + 1);
+          setMessage('O miserável é um gênio. Espera a outra pessoa');
+          setLoading(false);
+        });
       });
     } else {
-      setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
       querySnapshot.forEach(async (document) => {
-        await updateDocuments(document, false);
+        await updateDocuments(document, false).then(() => {
+          setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
+          setLoading(false);
+        });
       });
     }
-    setLoading(false);
 
     let matchCurrentQuestion;
     onSnapshot(m, (qs) => {
       qs.docs.forEach(async (d) => {
+        console.log(d.data());
         if (
           d.data()?.groups[1]?.questionsAnswered ===
             d?.data()?.currentQuestion &&
