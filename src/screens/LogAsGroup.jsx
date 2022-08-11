@@ -33,7 +33,6 @@ function LogAsGroup({ history }) {
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
     onSnapshot(m, (querySnapshot) => {
-      console.log(querySnapshot.docs.map((d) => d.data()));
       setmatches(querySnapshot.docs.map((d) => d.data()));
     });
   };
@@ -78,7 +77,6 @@ function LogAsGroup({ history }) {
 
     querySnapshot.forEach(async (document) => {
       await updateDocuments(document, name, groupId);
-      console.log('atualizou');
     });
   };
 

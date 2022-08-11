@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const MainWindow = styled.div`
-  background-color: #729b46;
+  background-color: var(--primary-green);
   width: 100%;
   height: min-content;
   border-radius: 15px;

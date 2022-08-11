@@ -50,7 +50,7 @@ function Quiz({ history }) {
 
   return (
     <MainWindow>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <StyledHeader>{match?.cod}</StyledHeader>
         <ul>
           {match?.groups.map((group) => (
@@ -60,12 +60,6 @@ function Quiz({ history }) {
           ))}
         </ul>
         <QuestionSection>
-          <Button
-            onClick={() => {
-              logout();
-            }}
-            child="Desconectar"
-          />
           {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>
@@ -78,6 +72,13 @@ function Quiz({ history }) {
             </>
           ) : null}
         </QuestionSection>
+        <Button
+          style={{ width: '10%', alignSelf: 'center', marginTop: 20 }}
+          onClick={() => {
+            logout();
+          }}
+          child="Sair"
+        />
       </div>
       {/* ) : null} */}
     </MainWindow>

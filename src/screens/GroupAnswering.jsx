@@ -38,7 +38,6 @@ function GroupAnswering({ history }) {
       collection(db, 'match'),
       where('cod', '==', window.location.href.split('/')[5])
     );
-    console.log('query de match', m);
 
     onSnapshot(m, (qs) => {
       setMatch(qs.docs.map((d) => d.data())[0]);
@@ -57,20 +56,17 @@ function GroupAnswering({ history }) {
     const q = query(collection(db, 'questions'));
 
     onSnapshot(q, (querySnapshot) => {
-      console.log(querySnapshot.docs.map((d) => d.data()));
       setQuestions(querySnapshot.docs.map((d) => d.data()));
     });
   }, []);
 
   const updateDocuments = async (document, correct) => {
     const documentRef = doc(db, 'match', document.id);
-    console.log('doc', documentRef);
     const currentgroup = document
       .data()
       .groups.find((g) => g.groupId === token);
 
     await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
-    console.log('doc atualizado');
 
     if (correct === true) {
       currentgroup.score += 1;
@@ -80,7 +76,6 @@ function GroupAnswering({ history }) {
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
-    console.log('doc atualizado');
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
@@ -90,7 +85,6 @@ function GroupAnswering({ history }) {
       where('cod', '==', window.location.href.split('/')[5])
     );
     const querySnapshot = await getDocs(m);
-    console.log('querySnapshot', querySnapshot);
     if (isCorrect) {
       const g = doc(db, 'group', `${token}`);
       await updateDoc(g, { score: score + 1 });
@@ -98,13 +92,13 @@ function GroupAnswering({ history }) {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, true);
         setScore(score + 1);
-        setMessage('O miserável é um gênio. Espera a outra pessoa');
+        setMessage('Parabéns!');
         setLoading(false);
       });
     } else {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, false);
-        setMessage('O miserável NÃO é um gênio. Espera a outra pessoa');
+        setMessage('Uma pena... Fique de olho para a próxima pergunta!');
         setLoading(false);
       });
     }
@@ -112,7 +106,6 @@ function GroupAnswering({ history }) {
     let matchCurrentQuestion;
     onSnapshot(m, (qs) => {
       qs.docs.forEach(async (d) => {
-        console.log(d.data());
         if (
           d.data()?.groups[1]?.questionsAnswered ===
             d?.data()?.currentQuestion &&
@@ -136,14 +129,8 @@ function GroupAnswering({ history }) {
         <StyledHeader>{match?.cod}</StyledHeader>
 
         <QuestionSection>
-          <Button
-            onClick={() => {
-              logout();
-            }}
-            child="Desconectar"
-          />
           {currentQuestion < questions.length ? (
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               <QuestionCount>
                 <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
                 {questions.length}
@@ -156,6 +143,11 @@ function GroupAnswering({ history }) {
                   questions[currentQuestion].answerOptions?.map(
                     (answer, index) => (
                       <Button
+                        style={{
+                          marginTop: 10,
+                          width: '70%',
+                          alignSelf: 'center',
+                        }}
                         key={index}
                         type="button"
                         child={answer.answerText}
@@ -184,6 +176,7 @@ function GroupAnswering({ history }) {
 //   display: flex;
 //   font-size: 24px;
 //   align-items: center;
+
 // `;
 
 const QuestionSection = styled.div`

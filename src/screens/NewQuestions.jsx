@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+/* eslint-disable consistent-return */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-nested-ternary */
 import { collection, onSnapshot, query, addDoc } from 'firebase/firestore';
@@ -5,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { MdCheckCircleOutline, MdArrowForwardIos } from 'react-icons/md';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import Modal from '../components/Modal';
@@ -102,9 +105,9 @@ function NewQuestions() {
         answerOptions: entry.answerOptions,
       });
     });
-    console.log('yes yes');
     setModal(false);
     setLoading(false);
+    setNewQuestionList([]);
   };
 
   const modalContent = () => {
@@ -119,6 +122,7 @@ function NewQuestions() {
             />
             {newQuestion.length > 10 ? (
               <Button
+                style={{ marginTop: 20 }}
                 onClick={() => setModalState('alternatives')}
                 child="Continuar"
               />
@@ -154,6 +158,7 @@ function NewQuestions() {
             alternative3.length > 0 &&
             alternative4.length > 0 ? (
               <Button
+                style={{ marginTop: 20 }}
                 child="Continuar"
                 onClick={() =>
                   handleAlternativesArray(
@@ -183,14 +188,28 @@ function NewQuestions() {
               onOptionClick={(option) => setCorrectAlternative(option)}
               defaultPlaceholder="Alternativas"
             />
-            <Button onClick={() => handleAddToArray()} child="Confirmar" />
+            <Button
+              style={{ marginTop: 20 }}
+              onClick={() => handleAddToArray()}
+              child="Confirmar"
+            />
           </StyledCreation>
         );
       default:
         return null;
     }
   };
-
+  const titleContent = () => {
+    if (modalState === 'question') {
+      return <span>Digite sua nova pergunta ou finalize o processo</span>;
+    }
+    if (modalState === 'alternatives') {
+      return <span>Digite suas alternativas</span>;
+    }
+    if (modalState === 'selectCorrect') {
+      return <span>Escolha a alternativa correta</span>;
+    }
+  };
   return (
     <>
       <MainWindow>
@@ -213,29 +232,50 @@ function NewQuestions() {
         show={modal}
         onClose={() => handleClose()}
         onGoBack={() => handleClose()}
-        title="Utilize este pop-up para criar novas perguntas"
+        title={titleContent()}
       >
-        <div>
-          {newQuestionList.map((nq) => (
-            <div>
-              <p>{nq.questionText}</p>
-              <ul>
-                {nq.answerOptions.map((ao) => (
-                  <li>
-                    {ao.answerText} {ao.isCorrect ? '- Resposta correta' : ''}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+          }}
+        >
+          {modalState === 'question'
+            ? newQuestionList.map((nq) => (
+                <div>
+                  <p style={{ fontWeight: 'bold' }}>
+                    Pergunta: {nq.questionText}
+                  </p>
+                  <ul>
+                    {nq.answerOptions.map((ao) => (
+                      <li
+                        style={{
+                          display: 'flex',
+                          width: '80%',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <p>-&gt; {ao.answerText}</p>
+                        {ao.isCorrect ? <MdCheckCircleOutline /> : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            : null}
           {modalContent()}
-          <Button
-            onClick={() => {
-              sendDataToFirebase();
-            }}
-            child="Finalizar"
-            loading={loading}
-          />
+          {modalState === 'question' && newQuestionList.length > 0 ? (
+            <Button
+              style={{ width: '50%', alignSelf: 'center' }}
+              onClick={() => {
+                sendDataToFirebase();
+              }}
+              child="Finalizar"
+              loading={loading}
+            />
+          ) : null}
         </div>
       </Modal>
     </>

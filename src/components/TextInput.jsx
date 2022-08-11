@@ -38,7 +38,11 @@ function TextInput({
         />
         {wrongData === true ? (
           <span
-            style={{ alignSelf: 'flex-start', marginTop: 4, color: '#A82E2E' }}
+            style={{
+              alignSelf: 'flex-start',
+              marginTop: 4,
+              color: 'var(--dark-red)',
+            }}
           >
             {wrongDataMessage}
           </span>
@@ -51,11 +55,11 @@ function TextInput({
 const StyledInput = styled.input`
   width: 100%;
   font-size: 16px;
-  color: #ffffff;
+  color: var(--white);
   background-color: transparent;
   outline: 0;
   border-width: 0 0 2px;
-  border-color: #34471f;
+  border-color: var(--dark-green);
   display: flex;
   padding: 5px;
   justify-content: flex-start;
@@ -63,7 +67,12 @@ const StyledInput = styled.input`
   cursor: pointer;
 
   &:focus {
-    border-color: #5d7740;
+    border-color: var(--dark-green);
+  }
+  ::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: var(--dark-green);
+    opacity: 1; /* Firefox */
   }
 `;
 

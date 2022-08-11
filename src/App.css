@@ -39,22 +39,18 @@ body {
 }
 
 .correct {
-  background-color: #2f922f;
+  background-color: var(--primary-green);
 }
 
 .incorrect {
-  background-color: #ff3333;
+  background-color: var(--dark-red);
 }
 
 button:hover {
-  background-color: #5d7740;
-  border: 2px solid #5d7740;
+  background-color: var(--secondary-green);
+  border-color: var(--secondary-green);
 }
 
 button:focus {
   outline: none;
-}
-
-button svg {
-  margin-right: 5px;
 }

@@ -24,7 +24,7 @@ export default function Button({
           height="30"
           width="30"
           radius="48"
-          color="#ffffff"
+          color="var(--white)"
           ariaLabel="watch-loading"
           wrapperStyle={{}}
           wrapperClassName=""
@@ -41,15 +41,15 @@ const StyledButton = styled.button`
   align-items: center;
   width: 100%;
   font-size: 16px;
-  color: #ffffff;
-  background-color: #34471f;
+  color: var(--white);
+  background-color: var(--dark-green);
   border-radius: 5px;
   padding: 5px;
-  border: 2px solid #34471f;
+  border: 2px solid var(--dark-green);
   cursor: pointer;
 
   &:disabled {
-    background-color: #34471f;
-    border: 2px solid #34471f;
+    background-color: var(--dark-green);
+    border: 2px solid var(--dark-green);
   }
 `;

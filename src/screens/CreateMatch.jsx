@@ -12,10 +12,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
+import styled from 'styled-components';
 import { db, auth, logout } from '../firebase';
 import { MainWindow } from '../components/MainWindow';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
+import { StyledHeader } from '../components/Texts';
 
 function CreateMatch({ history }) {
   const [matches, setmatches] = useState();
@@ -29,7 +31,6 @@ function CreateMatch({ history }) {
   const createMatch = async () => {
     setLoading(true);
     const questions = await query(collection(db, 'questions'));
-    console.log('questões', questions);
     const querySnapshot = await getDocs(questions);
     const questionLength = querySnapshot.size;
     const matchCodeId = uuidv4().substring(0, 6).toUpperCase();
@@ -41,7 +42,6 @@ function CreateMatch({ history }) {
       currentQuestion: 1,
       questionLength,
     });
-    console.log('adicionou um doc para match');
     history?.push(`/quiz/${matchCodeId}`);
     navigate(`/quiz/${matchCodeId}`);
     setLoading(false);
@@ -56,7 +56,6 @@ function CreateMatch({ history }) {
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
-    console.log('query de matches', m);
     onSnapshot(m, (querySnapshot) => {
       setmatches(querySnapshot.docs.map((d) => d.data()));
     });
@@ -88,45 +87,53 @@ function CreateMatch({ history }) {
   };
 
   return (
-    <MainWindow style={{ display: 'flex', flexDirection: 'column' }}>
-      <Button
-        onClick={() => {
-          createMatch();
-        }}
-        loading={loading}
-        child="Criar partida"
-      />
-
-      <TextInput
-        label="Inserir código da partida"
-        value={matchCode}
-        onTextChange={(value) => setMatchCode(value)}
-        wrongData={matchCodeError}
-        wrongDataMessage={
-          matchCodeError ? 'Código inexistente. Insira um código válido' : ''
-        }
-        type="text"
-      />
-      <Button
-        style={{ marginTop: 20 }}
-        onClick={() => connectToExistingMatch(matchCode)}
-        child="Conectar com partida"
-        loading={connectLoad}
-      />
-      <Button
-        onClick={() => {
-          handleLogout();
-        }}
-        child="Desconectar"
-      />
-      {user ? (
-        <Button
-          onClick={() => navigate('/newQuestions')}
-          child="Criação de perguntas"
+    <MainWindow>
+      <div style={{ display: 'flex', flexDirection: 'column', padding: 15 }}>
+        <StyledHeader>Painel de gerenciamento de organizador</StyledHeader>
+        <br />
+        <TextInput
+          label="Inserir código da partida"
+          value={matchCode}
+          onTextChange={(value) => setMatchCode(value)}
+          wrongData={matchCodeError}
+          wrongDataMessage={
+            matchCodeError ? 'Código inexistente. Insira um código válido' : ''
+          }
+          type="text"
         />
-      ) : null}
+        <StyledButton
+          style={{ marginTop: 20 }}
+          onClick={() => connectToExistingMatch(matchCode)}
+          child="Conectar com partida"
+          loading={connectLoad}
+        />
+        <StyledButton
+          onClick={() => {
+            createMatch();
+          }}
+          loading={loading}
+          child="Criar partida"
+        />
+        {user ? (
+          <StyledButton
+            onClick={() => navigate('/newQuestions')}
+            child="Criação de perguntas"
+          />
+        ) : null}
+        <StyledButton
+          onClick={() => {
+            handleLogout();
+          }}
+          child="Desconectar"
+        />
+      </div>
     </MainWindow>
   );
 }
+const StyledButton = styled(Button)`
+  margin-top: 20px;
+  width: 50%;
+  align-self: center;
+`;
 
 export default CreateMatch;

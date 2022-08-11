@@ -2,6 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { MdArrowDropDown } from 'react-icons/md';
 
 function Select({
   options,
@@ -93,6 +94,7 @@ function Select({
               {defaultPlaceholder}
             </span>
           )}
+          <MdArrowDropDown />
         </StyledSelect>
       </div>
 
@@ -132,14 +134,14 @@ function Select({
 const StyledSelect = styled.button`
   width: 100%;
   font-size: 16px;
-  color: #ffffff;
-  background-color: #34471f;
-  border-radius: 15px;
+  color: var(--white);
+  background-color: var(--dark-green);
+  border-radius: 5px;
   display: flex;
   padding: 5px;
   justify-content: flex-start;
   align-items: center;
-  border: 5px solid #34471f;
+  border: 5px solid var(--dark-green);
   cursor: pointer;
 `;
 
@@ -147,8 +149,8 @@ const StyledInputDiv = styled.div`
   border-radius: 0px 0px 5px 5px;
   margin-top: -5px;
   padding-top: 10px;
-  padding-bottom: 15px;
 
+  background-color: var(--dark-green);
   position: absolute;
   width: ${({ width }) => width}px;
   max-height: 300px;
@@ -168,27 +170,22 @@ const StyledInputDiv = styled.div`
     width: 4px;
     background: #e3e3e4;
   }
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: ${({ discreet }) =>
-      discreet ? 'var(--primary-purple-0)' : 'var(--secondary-purple-3)'};
-    width: 6px;
-    border-radius: 10px;
-  }
 `;
 
 const StyledOption = styled.div`
   width: 100%;
   font-size: 16px;
-  color: #ffffff;
-  background-color: #252d4a;
-  border-radius: 15px;
+  color: var(--white);
+  background-color: var(--dark-green);
   display: flex;
   padding: 5px;
   justify-content: flex-start;
   align-items: center;
-  border: 5px solid #234668;
   cursor: pointer;
+  &:hover {
+    background-color: var(--secondary-green);
+    border-color: var(--secondary-green);
+  }
 `;
 
 export default Select;
