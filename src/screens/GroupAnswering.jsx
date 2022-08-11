@@ -4,7 +4,6 @@
 /* eslint-disable no-multi-assign */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { useNavigate } from 'react-router-dom';
 import {
   collection,
   doc,
@@ -22,14 +21,13 @@ import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
 
-function GroupAnswering({ history }) {
+function GroupAnswering() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const token = localStorage.getItem('group');
 
@@ -43,12 +41,6 @@ function GroupAnswering({ history }) {
       setMatch(qs.docs.map((d) => d.data())[0]);
       return qs.docs.map((d) => d.data())[0];
     });
-  };
-
-  const logout = () => {
-    localStorage.removeItem('group');
-    history?.push('/');
-    navigate('/');
   };
 
   useEffect(() => {

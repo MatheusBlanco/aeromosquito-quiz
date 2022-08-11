@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { MdCheckCircleOutline, MdArrowForwardIos } from 'react-icons/md';
+import { MdCheckCircleOutline } from 'react-icons/md';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import Modal from '../components/Modal';
