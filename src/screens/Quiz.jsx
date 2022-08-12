@@ -55,7 +55,9 @@ function Quiz({ history }) {
         <ul>
           {match?.groups.map((group) => (
             <li key={group?.groupId}>
-              {group?.groupName} - {group?.score} pontos
+              <span style={{ fontSize: 20, fontWeight: 'bold' }}>
+                {group?.groupName} - {group?.score} pontos
+              </span>
             </li>
           ))}
         </ul>
@@ -73,7 +75,7 @@ function Quiz({ history }) {
           ) : null}
         </QuestionSection>
         <Button
-          style={{ width: '10%', alignSelf: 'center', marginTop: 20 }}
+          style={{ minWidth: '10%', alignSelf: 'center', marginTop: 20 }}
           onClick={() => {
             logout();
           }}
@@ -84,12 +86,6 @@ function Quiz({ history }) {
     </MainWindow>
   );
 }
-
-// const ScoreSection = styled.div`
-//   display: flex;
-//   font-size: 24px;
-//   align-items: center;
-// `;
 
 const QuestionSection = styled.div`
   width: 100%;

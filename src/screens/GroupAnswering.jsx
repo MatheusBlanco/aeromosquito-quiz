@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
@@ -16,20 +18,28 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
 
-function GroupAnswering() {
+function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem('group');
+
+  const leaveMatch = () => {
+    localStorage.removeItem('group');
+    history?.push('/quiz/group');
+    navigate('/quiz/group');
+  };
 
   const handleMatchInfo = async () => {
     const m = query(
@@ -118,8 +128,6 @@ function GroupAnswering() {
   return (
     <MainWindow>
       <div>
-        <StyledHeader>{match?.cod}</StyledHeader>
-
         <QuestionSection>
           {currentQuestion < questions.length ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -156,7 +164,54 @@ function GroupAnswering() {
                 )}
               </AnswerSection>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <QuestionSection>
+                <StyledHeader>Resultados: </StyledHeader>
+                <AnswerSection>
+                  {match?.groups?.find((group) => group?.groupId === token)
+                    .score >
+                  match?.groups?.find((group) => group?.groupId !== token)
+                    .score ? (
+                    <p>
+                      <span style={{ fontSize: 20 }}>Meus parabéns!</span>
+                      <br />
+                      <br />
+                      <span style={{ fontSize: 20 }}>
+                        Você venceu esta rodada!
+                      </span>
+                    </p>
+                  ) : match?.groups?.find((group) => group?.groupId === token)
+                      .score ===
+                    match?.groups?.find((group) => group?.groupId !== token)
+                      .score ? (
+                    <p>
+                      <span style={{ fontSize: 20 }}>
+                        Parece que houve um empate!
+                      </span>
+                      <br />
+                      <br />
+                      <span style={{ fontSize: 20 }}>
+                        Parabéns aos participantes!
+                      </span>
+                    </p>
+                  ) : (
+                    <p>
+                      <span style={{ fontSize: 20 }}>
+                        Infelizmente não foi dessa vez!
+                      </span>
+                      <br />
+                      <br />
+                      <span style={{ fontSize: 20 }}>
+                        Não deixe de tentar novamente!
+                      </span>
+                    </p>
+                  )}
+                </AnswerSection>
+                <Button onClick={() => leaveMatch()} child="Voltar" />
+              </QuestionSection>
+            </div>
+          )}
         </QuestionSection>
       </div>
       {/* ) : null} */}

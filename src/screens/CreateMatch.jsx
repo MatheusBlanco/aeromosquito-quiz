@@ -101,12 +101,14 @@ function CreateMatch({ history }) {
           }
           type="text"
         />
-        <StyledButton
-          style={{ marginTop: 20 }}
-          onClick={() => connectToExistingMatch(matchCode)}
-          child="Conectar com partida"
-          loading={connectLoad}
-        />
+        {matchCode.length >= 6 ? (
+          <StyledButton
+            style={{ marginTop: 20 }}
+            onClick={() => connectToExistingMatch(matchCode)}
+            child="Conectar com partida"
+            loading={connectLoad}
+          />
+        ) : null}
         <StyledButton
           onClick={() => {
             createMatch();
