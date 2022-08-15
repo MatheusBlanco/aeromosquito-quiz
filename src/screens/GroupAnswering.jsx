@@ -135,9 +135,6 @@ function GroupAnswering({ history }) {
                 <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
                 {questions.length}
               </QuestionCount>
-              <CurrentQuestion>
-                {questions[currentQuestion].questionText}
-              </CurrentQuestion>
               <AnswerSection>
                 {!message ? (
                   questions[currentQuestion].answerOptions?.map(
@@ -170,9 +167,9 @@ function GroupAnswering({ history }) {
                 <StyledHeader>Resultados: </StyledHeader>
                 <AnswerSection>
                   {match?.groups?.find((group) => group?.groupId === token)
-                    .score >
+                    ?.score >
                   match?.groups?.find((group) => group?.groupId !== token)
-                    .score ? (
+                    ?.score ? (
                     <p>
                       <span style={{ fontSize: 20 }}>Meus parabéns!</span>
                       <br />
@@ -219,13 +216,6 @@ function GroupAnswering({ history }) {
   );
 }
 
-// const ScoreSection = styled.div`
-//   display: flex;
-//   font-size: 24px;
-//   align-items: center;
-
-// `;
-
 const QuestionSection = styled.div`
   width: 100%;
   position: relative;
@@ -233,10 +223,6 @@ const QuestionSection = styled.div`
 
 const QuestionCount = styled.div`
   margin-bottom: 20px;
-`;
-
-const CurrentQuestion = styled.div`
-  margin-bottom: 12px;
 `;
 
 const AnswerSection = styled.div`

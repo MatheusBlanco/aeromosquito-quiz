@@ -212,7 +212,7 @@ function NewQuestions() {
   return (
     <>
       <MainWindow>
-        <div>
+        <div style={{ padding: 20 }}>
           <StyledHeader>Perguntas existentes na aplicação</StyledHeader>
           <ul>
             {existingQuestions?.map((question) => (
