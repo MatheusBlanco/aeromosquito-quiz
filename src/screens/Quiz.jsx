@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
@@ -21,9 +23,20 @@ function Quiz({ history }) {
       collection(db, 'match'),
       where('cod', '==', window.location.href.split('/')[4])
     );
-
-    onSnapshot(m, (querySnapshot) => {
+    onSnapshot(m, async (querySnapshot) => {
       setMatch(querySnapshot.docs.map((d) => d.data())[0]);
+      const q = await query(
+        collection(db, 'questions'),
+        where(
+          'id',
+          'in',
+          querySnapshot.docs.map((d) => d.data())[0]?.questionsArray
+        )
+      );
+      onSnapshot(q, async (qS) => {
+        setQuestions(qS.docs.map((d) => d.data()));
+      });
+
       setCurrentQuestion(
         querySnapshot.docs.map((d) => d.data())[0].currentQuestion
       );
@@ -36,16 +49,19 @@ function Quiz({ history }) {
     navigate('/');
   };
 
-  const handleQuestions = async () => {
-    const q = query(collection(db, 'questions'));
-    onSnapshot(q, async (querySnapshot) => {
-      setQuestions(querySnapshot.docs.map((d) => d.data()));
-    });
-  };
+  // const handleQuestions = async () => {
+  //   console.log(match);
+  //   const q = await query(
+  //     collection(db, 'questions'),
+  //     where('id', 'in', match?.questionsArray)
+  //   );
+  //   onSnapshot(q, async (querySnapshot) => {
+  //     setQuestions(querySnapshot.docs.map((d) => d.data()));
+  //   });
+  // };
 
   useEffect(() => {
     handleMatchInfo();
-    handleQuestions();
   }, []);
 
   return (

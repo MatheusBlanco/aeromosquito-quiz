@@ -28,11 +28,17 @@ function CreateMatch({ history }) {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
+  const generateArray = (questionLength) =>
+    [...new Array(10)].map(() => Math.round(Math.random() * questionLength));
+
   const createMatch = async () => {
     setLoading(true);
     const questions = await query(collection(db, 'questions'));
     const querySnapshot = await getDocs(questions);
     const questionLength = querySnapshot.size;
+
+    const questionsArray = generateArray(questionLength);
+
     const matchCodeId = uuidv4().substring(0, 6).toUpperCase();
     const match = collection(db, 'match');
     await addDoc(match, {
@@ -40,7 +46,8 @@ function CreateMatch({ history }) {
       cod: matchCodeId,
       groups: [],
       currentQuestion: 1,
-      questionLength,
+      questionLength: questionsArray.length,
+      questionsArray,
     });
     history?.push(`/quiz/${matchCodeId}`);
     navigate(`/quiz/${matchCodeId}`);

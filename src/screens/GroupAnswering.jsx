@@ -47,19 +47,21 @@ function GroupAnswering({ history }) {
       where('cod', '==', window.location.href.split('/')[5])
     );
 
-    onSnapshot(m, (qs) => {
+    onSnapshot(m, async (qs) => {
       setMatch(qs.docs.map((d) => d.data())[0]);
+      const q = await query(
+        collection(db, 'questions'),
+        where('id', 'in', qs.docs.map((d) => d.data())[0]?.questionsArray)
+      );
+      onSnapshot(q, async (qS) => {
+        setQuestions(qS.docs.map((d) => d.data()));
+      });
       return qs.docs.map((d) => d.data())[0];
     });
   };
 
   useEffect(() => {
     handleMatchInfo();
-    const q = query(collection(db, 'questions'));
-
-    onSnapshot(q, (querySnapshot) => {
-      setQuestions(querySnapshot.docs.map((d) => d.data()));
-    });
   }, []);
 
   const updateDocuments = async (document, correct) => {
@@ -126,6 +128,43 @@ function GroupAnswering({ history }) {
     });
   };
 
+  const endMessage = () => {
+    if (
+      match?.groups?.find((group) => group?.groupId === token)?.score >
+      match?.groups?.find((group) => group?.groupId !== token)?.score
+    ) {
+      return (
+        <p>
+          <span style={{ fontSize: 20 }}>Meus parabéns!</span>
+          <br />
+          <br />
+          <span style={{ fontSize: 20 }}>Você venceu esta rodada!</span>
+        </p>
+      );
+    }
+    if (
+      match?.groups?.find((group) => group?.groupId === token)?.score ===
+      match?.groups?.find((group) => group?.groupId !== token)?.score
+    ) {
+      return (
+        <p>
+          <span style={{ fontSize: 20 }}>Parece que houve um empate!</span>
+          <br />
+          <br />
+          <span style={{ fontSize: 20 }}>Parabéns aos participantes!</span>
+        </p>
+      );
+    }
+    return (
+      <p>
+        <span style={{ fontSize: 20 }}>Infelizmente não foi dessa vez!</span>
+        <br />
+        <br />
+        <span style={{ fontSize: 20 }}>Não deixe de tentar novamente!</span>
+      </p>
+    );
+  };
+
   return (
     <MainWindow>
       <div>
@@ -166,46 +205,7 @@ function GroupAnswering({ history }) {
             <div>
               <QuestionSection>
                 <StyledHeader>Resultados: </StyledHeader>
-                <AnswerSection>
-                  {match?.groups?.find((group) => group?.groupId === token)
-                    ?.score >
-                  match?.groups?.find((group) => group?.groupId !== token)
-                    ?.score ? (
-                    <p>
-                      <span style={{ fontSize: 20 }}>Meus parabéns!</span>
-                      <br />
-                      <br />
-                      <span style={{ fontSize: 20 }}>
-                        Você venceu esta rodada!
-                      </span>
-                    </p>
-                  ) : match?.groups?.find((group) => group?.groupId === token)
-                      .score ===
-                    match?.groups?.find((group) => group?.groupId !== token)
-                      .score ? (
-                    <p>
-                      <span style={{ fontSize: 20 }}>
-                        Parece que houve um empate!
-                      </span>
-                      <br />
-                      <br />
-                      <span style={{ fontSize: 20 }}>
-                        Parabéns aos participantes!
-                      </span>
-                    </p>
-                  ) : (
-                    <p>
-                      <span style={{ fontSize: 20 }}>
-                        Infelizmente não foi dessa vez!
-                      </span>
-                      <br />
-                      <br />
-                      <span style={{ fontSize: 20 }}>
-                        Não deixe de tentar novamente!
-                      </span>
-                    </p>
-                  )}
-                </AnswerSection>
+                <AnswerSection>{endMessage()}</AnswerSection>
                 <Button onClick={() => leaveMatch()} child="Voltar" />
               </QuestionSection>
             </div>
