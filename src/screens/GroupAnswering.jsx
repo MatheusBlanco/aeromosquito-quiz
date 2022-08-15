@@ -117,9 +117,10 @@ function GroupAnswering({ history }) {
           const documentRef = doc(db, 'match', d.id);
 
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
-
-          setCurrentQuestion(matchCurrentQuestion - 1);
-          setMessage(null);
+          setTimeout(() => {
+            setCurrentQuestion(matchCurrentQuestion - 1);
+            setMessage(null);
+          }, 5000);
         }
       });
     });
