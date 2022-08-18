@@ -23,6 +23,9 @@ import { db } from '../firebase';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
+import Correct from '../assets/images/Acerto.jpg';
+import Wrong from '../assets/images/Erro.jpg';
+import Tied from '../assets/images/Empate.jpg';
 
 function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
@@ -116,14 +119,14 @@ function GroupAnswering({ history }) {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, true);
         setScore(score + 1);
-        setMessage('Parabéns!');
+        setMessage('acerto');
         setLoading(false);
       });
     } else {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, false);
 
-        setMessage('Uma pena... Fique de olho para a próxima pergunta!');
+        setMessage('erro');
         setLoading(false);
       });
     }
@@ -149,41 +152,36 @@ function GroupAnswering({ history }) {
     });
   };
 
+  const answerMessage = () => {
+    if (message === 'acerto') {
+      return (
+        <img style={{ width: '30vw', minWidth: 200 }} src={Correct} alt="" />
+      );
+    }
+    if (message === 'erro') {
+      return (
+        <img style={{ width: '30vw', minWidth: 200 }} src={Wrong} alt="" />
+      );
+    }
+    return null;
+  };
+
   const endMessage = () => {
     if (
       match?.groups?.find((group) => group?.groupId === token)?.score >
       match?.groups?.find((group) => group?.groupId !== token)?.score
     ) {
       return (
-        <p>
-          <span style={{ fontSize: 20 }}>Meus parabéns!</span>
-          <br />
-          <br />
-          <span style={{ fontSize: 20 }}>Você venceu esta rodada!</span>
-        </p>
+        <img style={{ width: '30vw', minWidth: 200 }} src={Correct} alt="" />
       );
     }
     if (
       match?.groups?.find((group) => group?.groupId === token)?.score ===
       match?.groups?.find((group) => group?.groupId !== token)?.score
     ) {
-      return (
-        <p>
-          <span style={{ fontSize: 20 }}>Parece que houve um empate!</span>
-          <br />
-          <br />
-          <span style={{ fontSize: 20 }}>Parabéns aos participantes!</span>
-        </p>
-      );
+      return <img style={{ width: '30vw', minWidth: 200 }} src={Tied} alt="" />;
     }
-    return (
-      <p>
-        <span style={{ fontSize: 20 }}>Infelizmente não foi dessa vez!</span>
-        <br />
-        <br />
-        <span style={{ fontSize: 20 }}>Não deixe de tentar novamente!</span>
-      </p>
-    );
+    return <img style={{ width: '30vw', minWidth: 200 }} src={Wrong} alt="" />;
   };
 
   return (
@@ -222,7 +220,7 @@ function GroupAnswering({ history }) {
                       )
                     )
                   ) : !loading ? (
-                    <p>{message}</p>
+                    <p>{answerMessage()}</p>
                   ) : (
                     <p>Cadastrando resposta...</p>
                   )}
@@ -232,7 +230,7 @@ function GroupAnswering({ history }) {
                   Espere o resultado da escolha de grupos
                 </StyledHeader>
               ) : (
-                <p>{message}</p>
+                <p>{answerMessage()}</p>
               )}
             </div>
           ) : (
@@ -240,7 +238,11 @@ function GroupAnswering({ history }) {
               <QuestionSection>
                 <StyledHeader>Resultados: </StyledHeader>
                 <AnswerSection>{endMessage()}</AnswerSection>
-                <Button onClick={() => leaveMatch()} child="Voltar" />
+                <Button
+                  style={{ marginTop: 20 }}
+                  onClick={() => leaveMatch()}
+                  child="Voltar"
+                />
               </QuestionSection>
             </div>
           )}

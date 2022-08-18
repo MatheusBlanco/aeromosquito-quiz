@@ -19,6 +19,7 @@ import { db } from '../firebase';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
+import Thanks from '../assets/images/Obrigado.jpg';
 
 function Quiz({ history }) {
   const [questions, setQuestions] = useState([]);
@@ -117,7 +118,9 @@ function Quiz({ history }) {
                 </span>
               )}
             </>
-          ) : null}
+          ) : (
+            <img style={{ width: '30vw', minWidth: 200 }} src={Thanks} alt="" />
+          )}
         </QuestionSection>
         <Button
           style={{ minWidth: '10%', alignSelf: 'center', marginTop: 20 }}
@@ -127,7 +130,6 @@ function Quiz({ history }) {
           child="Sair"
         />
       </div>
-      {/* ) : null} */}
     </MainWindow>
   );
 }
