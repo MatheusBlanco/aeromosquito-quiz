@@ -124,12 +124,12 @@ function CreateMatch({ history }) {
           loading={loading}
           child="Criar partida"
         />
-        {user ? (
+        {/* {user ? (
           <StyledButton
             onClick={() => navigate('/newQuestions')}
             child="Criação de perguntas"
           />
-        ) : null}
+        ) : null} */}
         <StyledButton
           onClick={() => {
             handleLogout();
