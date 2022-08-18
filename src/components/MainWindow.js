@@ -11,8 +11,8 @@ export const MainWindow = styled.div`
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  max-width: 37vw;
-  max-height: 64vh;
+  max-width: 70vw;
+  max-height: 70vh;
 
   ::-webkit-scrollbar {
     width: 6px;
