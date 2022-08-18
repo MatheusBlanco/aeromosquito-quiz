@@ -2,7 +2,13 @@
 /* eslint-disable consistent-return */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-nested-ternary */
-import { collection, onSnapshot, query, addDoc } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  query,
+  addDoc,
+  getDocs,
+} from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
@@ -97,9 +103,14 @@ function NewQuestions() {
 
   const sendDataToFirebase = async () => {
     setLoading(true);
-    newQuestionList.forEach(async (entry) => {
+    const questions = query(collection(db, 'questions'));
+    const querySnapshot = await getDocs(questions);
+    const questionLength = querySnapshot.size;
+
+    newQuestionList.forEach(async (entry, index) => {
       const match = collection(db, 'questions');
       return addDoc(match, {
+        id: index + questionLength + 1,
         questionText: entry.questionText,
         answerOptions: entry.answerOptions,
       });
