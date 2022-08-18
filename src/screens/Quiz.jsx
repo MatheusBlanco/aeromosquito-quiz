@@ -4,7 +4,15 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { collection, query, onSnapshot, where } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  doc,
+  updateDoc,
+  getDocs,
+} from 'firebase/firestore';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
@@ -49,16 +57,14 @@ function Quiz({ history }) {
     navigate('/');
   };
 
-  // const handleQuestions = async () => {
-  //   console.log(match);
-  //   const q = await query(
-  //     collection(db, 'questions'),
-  //     where('id', 'in', match?.questionsArray)
-  //   );
-  //   onSnapshot(q, async (querySnapshot) => {
-  //     setQuestions(querySnapshot.docs.map((d) => d.data()));
-  //   });
-  // };
+  const updateWithAnswerer = async (id, name) => {
+    const m = query(collection(db, 'match'), where('cod', '==', match.cod));
+    const querySnapshot = await getDocs(m);
+    querySnapshot.forEach(async (document) => {
+      const documentRef = doc(db, 'match', document.id);
+      await updateDoc(documentRef, 'currentAnswerer', { id, name });
+    });
+  };
 
   useEffect(() => {
     handleMatchInfo();
@@ -87,6 +93,24 @@ function Quiz({ history }) {
               <CurrentQuestion>
                 {questions[currentQuestion - 1]?.questionText}
               </CurrentQuestion>
+              {!match?.currentAnswerer || match?.currentAnswerer === null ? (
+                <>
+                  <span>- Escolha o grupo que poderá responder à pergunta</span>
+                  {match?.groups.map((group) => (
+                    <Button
+                      style={{ marginTop: '1vh' }}
+                      onClick={() =>
+                        updateWithAnswerer(group.groupId, group.groupName)
+                      }
+                      child={group?.groupName}
+                    />
+                  ))}
+                </>
+              ) : (
+                <span style={{ fontWeight: 'bold' }}>
+                  O time {match.currentAnswerer.name} pode responder à pergunta
+                </span>
+              )}
             </>
           ) : null}
         </QuestionSection>
@@ -114,6 +138,8 @@ const QuestionCount = styled.div`
 
 const CurrentQuestion = styled.div`
   margin-bottom: 12px;
+  font-weight: bold;
+  font-size: 2.5vh;
 `;
 
 export default Quiz;

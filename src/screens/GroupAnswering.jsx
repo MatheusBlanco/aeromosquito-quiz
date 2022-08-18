@@ -70,16 +70,25 @@ function GroupAnswering({ history }) {
       .data()
       .groups.find((g) => g.groupId === token);
 
+    const foeGroup = document
+      .data()
+      .groups.find((group) => group.groupId !== token);
+
+    await updateDoc(documentRef, 'currentAnswerer', null);
+
     await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
+    await updateDoc(documentRef, 'groups', arrayRemove(foeGroup));
 
     if (correct === true) {
       currentgroup.score += 1;
       currentgroup.questionsAnswered += 1;
+      foeGroup.questionsAnswered += 1;
     } else {
       currentgroup.questionsAnswered += 1;
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
+    await updateDoc(documentRef, 'groups', arrayRemove(foeGroup));
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
@@ -102,6 +111,16 @@ function GroupAnswering({ history }) {
     } else {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, false);
+
+        const foeGroup = document
+          .data()
+          .groups.find((g) => g.groupId !== token);
+        const documentRef = doc(db, 'match', document.id);
+        await updateDoc(documentRef, 'currentAnswerer', {
+          id: foeGroup?.groupId,
+          name: foeGroup?.groupName,
+        });
+
         setMessage('Uma pena... Fique de olho para a próxima pergunta!');
         setLoading(false);
       });
@@ -119,6 +138,7 @@ function GroupAnswering({ history }) {
           const documentRef = doc(db, 'match', d.id);
 
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
+          await updateDoc(documentRef, 'currentAnswerer', null);
           setTimeout(() => {
             setCurrentQuestion(matchCurrentQuestion - 1);
             setMessage(null);
@@ -175,31 +195,39 @@ function GroupAnswering({ history }) {
                 <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
                 {questions.length}
               </QuestionCount>
-              <AnswerSection>
-                {!message ? (
-                  questions[currentQuestion].answerOptions?.map(
-                    (answer, index) => (
-                      <Button
-                        style={{
-                          marginTop: 10,
-                          width: '70%',
-                          alignSelf: 'center',
-                        }}
-                        key={index}
-                        type="button"
-                        child={answer.answerText}
-                        onClick={() =>
-                          handleAnswerOptionClick(answer.isCorrect)
-                        }
-                      />
+              {match?.currentAnswerer?.id === token && !message ? (
+                <AnswerSection>
+                  {!message ? (
+                    questions[currentQuestion].answerOptions?.map(
+                      (answer, index) => (
+                        <Button
+                          style={{
+                            marginTop: 10,
+                            width: '70%',
+                            alignSelf: 'center',
+                          }}
+                          key={index}
+                          type="button"
+                          child={answer.answerText}
+                          onClick={() =>
+                            handleAnswerOptionClick(answer.isCorrect)
+                          }
+                        />
+                      )
                     )
-                  )
-                ) : !loading ? (
-                  <p>{message}</p>
-                ) : (
-                  <p>Cadastrando resposta...</p>
-                )}
-              </AnswerSection>
+                  ) : !loading ? (
+                    <p>{message}</p>
+                  ) : (
+                    <p>Cadastrando resposta...</p>
+                  )}
+                </AnswerSection>
+              ) : !message ? (
+                <StyledHeader>
+                  Espere o resultado da escolha de grupos
+                </StyledHeader>
+              ) : (
+                <p>{message}</p>
+              )}
             </div>
           ) : (
             <div>
