@@ -49,6 +49,7 @@ function GroupAnswering({ history }) {
 
     onSnapshot(m, async (qs) => {
       setMatch(qs.docs.map((d) => d.data())[0]);
+      setCurrentQuestion(qs.docs.map((mat) => mat.data())[0].currentQuestion);
       const q = await query(
         collection(db, 'questions'),
         where('id', 'in', qs.docs.map((d) => d.data())[0]?.questionsArray)
@@ -74,8 +75,6 @@ function GroupAnswering({ history }) {
       .data()
       .groups.find((group) => group.groupId !== token);
 
-    await updateDoc(documentRef, 'currentAnswerer', null);
-
     await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
     await updateDoc(documentRef, 'groups', arrayRemove(foeGroup));
 
@@ -83,12 +82,16 @@ function GroupAnswering({ history }) {
       currentgroup.score += 1;
       currentgroup.questionsAnswered += 1;
       foeGroup.questionsAnswered += 1;
+      await updateDoc(documentRef, 'currentAnswerer', null);
     } else {
-      currentgroup.questionsAnswered += 1;
+      await updateDoc(documentRef, 'currentAnswerer', {
+        id: foeGroup?.groupId,
+        name: foeGroup?.groupName,
+      });
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
-    await updateDoc(documentRef, 'groups', arrayRemove(foeGroup));
+    await updateDoc(documentRef, 'groups', arrayUnion(foeGroup));
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
@@ -112,15 +115,6 @@ function GroupAnswering({ history }) {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, false);
 
-        const foeGroup = document
-          .data()
-          .groups.find((g) => g.groupId !== token);
-        const documentRef = doc(db, 'match', document.id);
-        await updateDoc(documentRef, 'currentAnswerer', {
-          id: foeGroup?.groupId,
-          name: foeGroup?.groupName,
-        });
-
         setMessage('Uma pena... Fique de olho para a próxima pergunta!');
         setLoading(false);
       });
@@ -140,7 +134,6 @@ function GroupAnswering({ history }) {
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
           await updateDoc(documentRef, 'currentAnswerer', null);
           setTimeout(() => {
-            setCurrentQuestion(matchCurrentQuestion - 1);
             setMessage(null);
           }, 5000);
         }
@@ -192,13 +185,18 @@ function GroupAnswering({ history }) {
           {currentQuestion < questions.length ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <QuestionCount>
-                <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
-                {questions.length}
+                <StyledHeader>
+                  {match?.groups?.find((g) => g?.groupId === token)?.groupName}
+                </StyledHeader>
+                <br />
+                <StyledHeader>
+                  Question {currentQuestion}/{questions.length}
+                </StyledHeader>
               </QuestionCount>
               {match?.currentAnswerer?.id === token && !message ? (
                 <AnswerSection>
                   {!message ? (
-                    questions[currentQuestion].answerOptions?.map(
+                    questions[currentQuestion - 1].answerOptions?.map(
                       (answer, index) => (
                         <Button
                           style={{
@@ -252,6 +250,8 @@ const QuestionSection = styled.div`
 
 const QuestionCount = styled.div`
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const AnswerSection = styled.div`
