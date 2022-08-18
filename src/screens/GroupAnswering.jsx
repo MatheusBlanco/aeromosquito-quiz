@@ -49,6 +49,7 @@ function GroupAnswering({ history }) {
 
     onSnapshot(m, async (qs) => {
       setMatch(qs.docs.map((d) => d.data())[0]);
+      setCurrentQuestion(qs.docs.map((mat) => mat.data())[0].currentQuestion);
       const q = await query(
         collection(db, 'questions'),
         where('id', 'in', qs.docs.map((d) => d.data())[0]?.questionsArray)
@@ -70,16 +71,35 @@ function GroupAnswering({ history }) {
       .data()
       .groups.find((g) => g.groupId === token);
 
+    const foeGroup = document
+      .data()
+      .groups.find((group) => group.groupId !== token);
+
     await updateDoc(documentRef, 'groups', arrayRemove(currentgroup));
+    await updateDoc(documentRef, 'groups', arrayRemove(foeGroup));
 
     if (correct === true) {
       currentgroup.score += 1;
       currentgroup.questionsAnswered += 1;
+      foeGroup.questionsAnswered += 1;
+      await updateDoc(documentRef, 'currentAnswerer', null);
     } else {
-      currentgroup.questionsAnswered += 1;
+      if (document?.data()?.currentAnswerer?.lastAnswererId === null) {
+        await updateDoc(documentRef, 'currentAnswerer', {
+          id: foeGroup?.groupId,
+          name: foeGroup?.groupName,
+          lastAnswererId: currentgroup?.groupId,
+          lastAnswererName: currentgroup?.groupName,
+        });
+      } else {
+        await updateDoc(documentRef, 'currentAnswerer', null);
+        currentgroup.questionsAnswered += 1;
+        foeGroup.questionsAnswered += 1;
+      }
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
+    await updateDoc(documentRef, 'groups', arrayUnion(foeGroup));
   };
 
   const handleAnswerOptionClick = async (isCorrect) => {
@@ -102,6 +122,7 @@ function GroupAnswering({ history }) {
     } else {
       querySnapshot.forEach(async (document) => {
         await updateDocuments(document, false);
+
         setMessage('Uma pena... Fique de olho para a próxima pergunta!');
         setLoading(false);
       });
@@ -119,8 +140,8 @@ function GroupAnswering({ history }) {
           const documentRef = doc(db, 'match', d.id);
 
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
+          await updateDoc(documentRef, 'currentAnswerer', null);
           setTimeout(() => {
-            setCurrentQuestion(matchCurrentQuestion - 1);
             setMessage(null);
           }, 5000);
         }
@@ -169,37 +190,50 @@ function GroupAnswering({ history }) {
     <MainWindow>
       <div>
         <QuestionSection>
-          {currentQuestion < questions.length ? (
+          {currentQuestion <= questions.length ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <QuestionCount>
-                <StyledHeader>Question {currentQuestion + 1}</StyledHeader>/
-                {questions.length}
+                <StyledHeader>
+                  {match?.groups?.find((g) => g?.groupId === token)?.groupName}
+                </StyledHeader>
+                <br />
+                <StyledHeader>
+                  Question {currentQuestion}/{questions.length}
+                </StyledHeader>
               </QuestionCount>
-              <AnswerSection>
-                {!message ? (
-                  questions[currentQuestion].answerOptions?.map(
-                    (answer, index) => (
-                      <Button
-                        style={{
-                          marginTop: 10,
-                          width: '70%',
-                          alignSelf: 'center',
-                        }}
-                        key={index}
-                        type="button"
-                        child={answer.answerText}
-                        onClick={() =>
-                          handleAnswerOptionClick(answer.isCorrect)
-                        }
-                      />
+              {match?.currentAnswerer?.id === token && !message ? (
+                <AnswerSection>
+                  {!message ? (
+                    questions[currentQuestion - 1].answerOptions?.map(
+                      (answer, index) => (
+                        <Button
+                          style={{
+                            marginTop: 10,
+                            width: '70%',
+                            alignSelf: 'center',
+                          }}
+                          key={index}
+                          type="button"
+                          child={answer.answerText}
+                          onClick={() =>
+                            handleAnswerOptionClick(answer.isCorrect)
+                          }
+                        />
+                      )
                     )
-                  )
-                ) : !loading ? (
-                  <p>{message}</p>
-                ) : (
-                  <p>Cadastrando resposta...</p>
-                )}
-              </AnswerSection>
+                  ) : !loading ? (
+                    <p>{message}</p>
+                  ) : (
+                    <p>Cadastrando resposta...</p>
+                  )}
+                </AnswerSection>
+              ) : !message ? (
+                <StyledHeader>
+                  Espere o resultado da escolha de grupos
+                </StyledHeader>
+              ) : (
+                <p>{message}</p>
+              )}
             </div>
           ) : (
             <div>
@@ -224,6 +258,8 @@ const QuestionSection = styled.div`
 
 const QuestionCount = styled.div`
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const AnswerSection = styled.div`
