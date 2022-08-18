@@ -84,10 +84,18 @@ function GroupAnswering({ history }) {
       foeGroup.questionsAnswered += 1;
       await updateDoc(documentRef, 'currentAnswerer', null);
     } else {
-      await updateDoc(documentRef, 'currentAnswerer', {
-        id: foeGroup?.groupId,
-        name: foeGroup?.groupName,
-      });
+      if (document?.data()?.currentAnswerer?.lastAnswererId === null) {
+        await updateDoc(documentRef, 'currentAnswerer', {
+          id: foeGroup?.groupId,
+          name: foeGroup?.groupName,
+          lastAnswererId: currentgroup?.groupId,
+          lastAnswererName: currentgroup?.groupName,
+        });
+      } else {
+        await updateDoc(documentRef, 'currentAnswerer', null);
+        currentgroup.questionsAnswered += 1;
+        foeGroup.questionsAnswered += 1;
+      }
     }
 
     await updateDoc(documentRef, 'groups', arrayUnion(currentgroup));
@@ -182,7 +190,7 @@ function GroupAnswering({ history }) {
     <MainWindow>
       <div>
         <QuestionSection>
-          {currentQuestion < questions.length ? (
+          {currentQuestion <= questions.length ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <QuestionCount>
                 <StyledHeader>

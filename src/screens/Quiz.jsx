@@ -62,7 +62,12 @@ function Quiz({ history }) {
     const querySnapshot = await getDocs(m);
     querySnapshot.forEach(async (document) => {
       const documentRef = doc(db, 'match', document.id);
-      await updateDoc(documentRef, 'currentAnswerer', { id, name });
+      await updateDoc(documentRef, 'currentAnswerer', {
+        id,
+        name,
+        lastAnswererId: null,
+        lastAnswererName: null,
+      });
     });
   };
 
