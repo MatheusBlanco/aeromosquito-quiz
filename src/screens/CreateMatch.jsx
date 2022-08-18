@@ -48,6 +48,7 @@ function CreateMatch({ history }) {
       currentQuestion: 1,
       questionLength: questionsArray.length,
       questionsArray,
+      currentAnswerer: null,
     });
     history?.push(`/quiz/${matchCodeId}`);
     navigate(`/quiz/${matchCodeId}`);
