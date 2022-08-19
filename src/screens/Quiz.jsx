@@ -93,7 +93,7 @@ function Quiz({ history }) {
           {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>
-                <StyledHeader>Question {currentQuestion}</StyledHeader>/
+                <StyledHeader>Pergunta {currentQuestion}</StyledHeader>/
                 {questions?.length}
               </QuestionCount>
               <CurrentQuestion>
