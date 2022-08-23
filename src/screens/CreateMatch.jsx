@@ -29,7 +29,7 @@ function CreateMatch({ history }) {
   const navigate = useNavigate();
 
   const generateArray = (questionLength) =>
-    [...new Array(5)].map(() => Math.round(Math.random() * questionLength));
+    [...new Array(10)].map(() => Math.round(Math.random() * questionLength));
 
   const createMatch = async () => {
     setLoading(true);
