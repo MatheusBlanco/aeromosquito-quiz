@@ -1,19 +1,20 @@
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
-import React, { useState, useEffect } from 'react';
 import {
-  collection,
   addDoc,
-  onSnapshot,
-  where,
-  updateDoc,
-  getDocs,
-  doc,
-  query,
   arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
 import TextInput from '../components/TextInput';
@@ -24,11 +25,16 @@ function LogAsGroup({ history }) {
   const [groupName, setGroupName] = useState('');
   const [matches, setmatches] = useState();
   const [matchCode, setMatchCode] = useState('');
-  const [matchCodeError, setMatchCodeError] = useState(false);
   const [missingGroup, setMissingGroup] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('group');
+    history?.push('/');
+    navigate('/');
+  };
 
   const handleMatches = async () => {
     const m = query(collection(db, 'match'));
@@ -92,9 +98,8 @@ function LogAsGroup({ history }) {
     setLoading(true);
     const error = validateMatchCode(match);
     if (error === undefined) {
-      setMatchCodeError(true);
+      toast.error('Código inexistente. Insira um código válido');
     } else {
-      setMatchCodeError(false);
       if (name.length === 0 || name.length < 6) {
         setMissingGroup(true);
       } else {
@@ -110,7 +115,9 @@ function LogAsGroup({ history }) {
   };
 
   return (
-    <MainWindow style={{ display: 'flex', flexDirection: 'column' }}>
+    <MainWindow
+      style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+    >
       <StyledHeader>Iniciar jogo</StyledHeader>
       <TextInput
         label="Nome do Grupo"
@@ -119,23 +126,31 @@ function LogAsGroup({ history }) {
         type="text"
         wrongData={missingGroup}
         wrongDataMessage="Insira um nome de grupo válido"
+        tooltip
+        tooltipMessage="O nome deve conter ao menos 6 caractéres"
       />
 
       <TextInput
-        label="Inserir código da partida"
+        label="Inserir código da partida (fornecido pelo organizador)"
         value={matchCode}
         onTextChange={(value) => setMatchCode(value.toUpperCase())}
-        wrongData={matchCodeError}
-        wrongDataMessage={
-          matchCodeError ? 'Código inexistente. Insira um código válido' : ''
-        }
         type="text"
+        tooltip
+        tooltipMessage="O código deve conter 6 caractéres"
       />
       <Button
         style={{ marginTop: 20 }}
         onClick={() => handleLogAsGroup(groupName, matchCode)}
-        child="Conectar com partida"
+        child="Conectar a uma partida existente"
         loading={loading}
+        disabled={groupName.length < 6 || matchCode.length < 6}
+      />
+      <Button
+        onClick={() => {
+          handleLogout();
+        }}
+        child="Voltar"
+        style={{ backgroundColor: 'var(--dark-red)', border: '0px' }}
       />
     </MainWindow>
   );

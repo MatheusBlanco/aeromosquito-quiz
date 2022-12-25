@@ -5,8 +5,8 @@ function ProgressBar({ bgcolor, completed }) {
     height: 20,
     minWidth: '200px',
     width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 50,
+    backgroundColor: 'var(--secondary-green)',
+    borderRadius: 5,
   };
 
   const fillerStyles = {

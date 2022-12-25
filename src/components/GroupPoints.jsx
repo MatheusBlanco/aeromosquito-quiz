@@ -10,10 +10,14 @@ export default function GroupPoints({ match, noMatchInfo }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {' '}
-      {!noMatchInfo && <StyledHeader>Partida {match?.cod}</StyledHeader>}
+      {!noMatchInfo && (
+        <StyledHeader style={{ fontSize: '14px' }}>
+          Partida {match?.cod}
+        </StyledHeader>
+      )}
       {match?.groups
         .sort((a, b) => b.score - a.score)
-        .map((group, index) => {
+        .map((group) => {
           const groupPointsPercentage =
             (group.score / match.questionLength) * 100;
           const currentGroup = match.groups.find(
@@ -25,18 +29,36 @@ export default function GroupPoints({ match, noMatchInfo }) {
 
           const handleMedalRender = () => {
             if (currentGroup?.score > otherGroup?.score) {
-              return <GoldMedal />;
+              return (
+                <div style={{ minWidth: '20px' }}>
+                  <GoldMedal />
+                </div>
+              );
             }
             if (currentGroup?.score < otherGroup?.score) {
-              return <SilverMedal />;
+              return (
+                <div style={{ minWidth: '20px' }}>
+                  <SilverMedal />
+                </div>
+              );
             }
             if (currentGroup?.score === otherGroup?.score) {
-              return <GoldMedal />;
+              return (
+                <div style={{ minWidth: '20px' }}>
+                  <GoldMedal />
+                </div>
+              );
             }
           };
           return (
             <div key={group?.groupId}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <span style={{ fontSize: 20, fontWeight: 'bold' }}>
                   Pontos time {group?.groupName}
                 </span>

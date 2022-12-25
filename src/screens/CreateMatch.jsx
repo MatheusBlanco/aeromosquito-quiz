@@ -1,23 +1,24 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
-import React, { useState, useEffect } from 'react';
 import {
-  collection,
   addDoc,
-  query,
+  collection,
   getDocs,
   onSnapshot,
+  query,
 } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
+import toast from 'react-hot-toast';
 import styled from 'styled-components';
-import { db, auth, logout } from '../firebase';
-import { MainWindow } from '../components/MainWindow';
 import Button from '../components/Button';
+import { MainWindow } from '../components/MainWindow';
 import TextInput from '../components/TextInput';
 import { StyledHeader } from '../components/Texts';
+import { auth, db, logout } from '../firebase';
 
 function CreateMatch({ history }) {
   const [matches, setmatches] = useState();
@@ -49,9 +50,16 @@ function CreateMatch({ history }) {
       questionLength: questionsArray.length,
       questionsArray,
       currentAnswerer: null,
-    });
-    history?.push(`/quiz/${matchCodeId}`);
-    navigate(`/quiz/${matchCodeId}`);
+    })
+      .then(() => {
+        history?.push(`/quiz/${matchCodeId}`);
+        navigate(`/quiz/${matchCodeId}`);
+      })
+      .catch(() =>
+        toast.error(
+          'Houve um erro no sistema ao tentar criar a partida, tente novamente mais tarde'
+        )
+      );
     setLoading(false);
   };
 
@@ -111,10 +119,18 @@ function CreateMatch({ history }) {
         />
         {matchCode.length >= 6 ? (
           <StyledButton
-            style={{ marginTop: 20 }}
             onClick={() => connectToExistingMatch(matchCode)}
             child="Conectar com partida"
             loading={connectLoad}
+            style={{ backgroundColor: 'var(--secondary-green)', border: '0px' }}
+          />
+        ) : null}
+
+        {user ? (
+          <StyledButton
+            onClick={() => navigate('/newQuestions')}
+            child="Criação de perguntas"
+            style={{ backgroundColor: 'var(--secondary-green)' }}
           />
         ) : null}
         <StyledButton
@@ -122,19 +138,15 @@ function CreateMatch({ history }) {
             createMatch();
           }}
           loading={loading}
+          style={{ height: '80px', fontSize: '30px' }}
           child="Criar partida"
         />
-        {user ? (
-          <StyledButton
-            onClick={() => navigate('/newQuestions')}
-            child="Criação de perguntas"
-          />
-        ) : null}
         <StyledButton
           onClick={() => {
             handleLogout();
           }}
           child="Desconectar"
+          style={{ backgroundColor: 'var(--dark-red)', border: '0px' }}
         />
       </div>
     </MainWindow>
@@ -142,7 +154,7 @@ function CreateMatch({ history }) {
 }
 const StyledButton = styled(Button)`
   margin-top: 20px;
-  width: 50%;
+  width: 100%;
   align-self: center;
 `;
 

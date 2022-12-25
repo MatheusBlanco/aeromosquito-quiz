@@ -21,6 +21,7 @@ import Correct from '../assets/images/Acerto.jpg';
 import Tied from '../assets/images/Empate.jpg';
 import Wrong from '../assets/images/Erro.jpg';
 import Button from '../components/Button';
+import { GOBackButton } from '../components/GoBackButton';
 import GroupPoints from '../components/GroupPoints';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
@@ -187,17 +188,77 @@ function GroupAnswering({ history }) {
   };
 
   return (
-    <MainWindow>
-      <div>
-        {currentQuestion <= questions.length ? (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: width <= 500 ? 'column-reverse' : 'row',
-              alignContent: 'flex-start',
-              gap: '20px',
-            }}
-          >
+    <div>
+      <MainWindow>
+        <div>
+          {currentQuestion <= questions.length ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: width <= 500 ? 'column-reverse' : 'row',
+                alignContent: 'flex-start',
+                gap: '20px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignContent: 'flex-start',
+                  gap: '20px',
+                }}
+              >
+                <GOBackButton onClickFunc={() => leaveMatch()} />
+                <StyledHeader>
+                  Questão {currentQuestion}/{questions.length}
+                </StyledHeader>
+                <CurrentQuestion>
+                  {questions[currentQuestion - 1]?.questionText}
+                </CurrentQuestion>
+                {match?.currentAnswerer?.id === token && !message ? (
+                  <AnswerSection>
+                    {!message ? (
+                      questions[currentQuestion - 1].answerOptions?.map(
+                        (answer, index) => (
+                          <Button
+                            style={{
+                              marginTop: 10,
+                              width: '70%',
+                              alignSelf: 'center',
+                            }}
+                            key={index}
+                            type="button"
+                            child={answer.answerText}
+                            onClick={() =>
+                              handleAnswerOptionClick(answer.isCorrect)
+                            }
+                          />
+                        )
+                      )
+                    ) : !loading ? (
+                      <p>{answerMessage()}</p>
+                    ) : (
+                      <p>Cadastrando resposta...</p>
+                    )}
+                  </AnswerSection>
+                ) : !message ? (
+                  <StyledHeader>
+                    Espere o resultado da escolha de grupos
+                  </StyledHeader>
+                ) : (
+                  <p>{answerMessage()}</p>
+                )}
+              </div>{' '}
+              <div className="divider" />
+              <div>
+                <StyledHeader>
+                  Grupo{' '}
+                  {match?.groups?.find((g) => g?.groupId === token)?.groupName}
+                </StyledHeader>
+                <GroupPoints match={match} />
+              </div>
+            </div>
+          ) : (
             <div
               style={{
                 display: 'flex',
@@ -206,74 +267,14 @@ function GroupAnswering({ history }) {
                 gap: '20px',
               }}
             >
-              <StyledHeader>
-                Questão {currentQuestion}/{questions.length}
-              </StyledHeader>
-              {match?.currentAnswerer?.id === token && !message ? (
-                <AnswerSection>
-                  {!message ? (
-                    questions[currentQuestion - 1].answerOptions?.map(
-                      (answer, index) => (
-                        <Button
-                          style={{
-                            marginTop: 10,
-                            width: '70%',
-                            alignSelf: 'center',
-                          }}
-                          key={index}
-                          type="button"
-                          child={answer.answerText}
-                          onClick={() =>
-                            handleAnswerOptionClick(answer.isCorrect)
-                          }
-                        />
-                      )
-                    )
-                  ) : !loading ? (
-                    <p>{answerMessage()}</p>
-                  ) : (
-                    <p>Cadastrando resposta...</p>
-                  )}
-                </AnswerSection>
-              ) : !message ? (
-                <StyledHeader>
-                  Espere o resultado da escolha de grupos
-                </StyledHeader>
-              ) : (
-                <p>{answerMessage()}</p>
-              )}
-            </div>{' '}
-            <div className="divider" />
-            <div>
-              <StyledHeader>
-                Grupo{' '}
-                {match?.groups?.find((g) => g?.groupId === token)?.groupName}
-              </StyledHeader>
-              <GroupPoints match={match} />
+              <StyledHeader>Resultados: </StyledHeader>
+              <AnswerSection>{endMessage()}</AnswerSection>
+              <GroupPoints match={match} noMatchInfo />
             </div>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignContent: 'flex-start',
-              gap: '20px',
-            }}
-          >
-            <StyledHeader>Resultados: </StyledHeader>
-            <AnswerSection>{endMessage()}</AnswerSection>
-            <GroupPoints match={match} noMatchInfo />
-
-            <Button
-              style={{ marginTop: 20 }}
-              onClick={() => leaveMatch()}
-              child="Voltar"
-            />
-          </div>
-        )}
-      </div>
-    </MainWindow>
+          )}
+        </div>
+      </MainWindow>
+    </div>
   );
 }
 
@@ -283,5 +284,11 @@ const AnswerSection = styled.div`
   flex-direction: column;
   justify-content: space-between;
 `;
-
+const CurrentQuestion = styled.div`
+  margin-bottom: 12px;
+  font-weight: bold;
+  max-width: 300px;
+  font-size: 2.5vh;
+  display: block;
+`;
 export default GroupAnswering;

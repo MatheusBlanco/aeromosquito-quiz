@@ -50,7 +50,7 @@ const StyledButton = styled.button`
   cursor: pointer;
 
   &:disabled {
-    background-color: var(--dark-green);
-    border: 2px solid var(--dark-green);
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;

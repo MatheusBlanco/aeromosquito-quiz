@@ -12,11 +12,15 @@ import {
   where,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
 import '../App.css';
 import Thanks from '../assets/images/Obrigado.jpg';
 import Button from '../components/Button';
+import { GOBackButton } from '../components/GoBackButton';
 import GroupPoints from '../components/GroupPoints';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
@@ -56,9 +60,8 @@ function Quiz({ history }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('group');
-    history?.push('/');
-    navigate('/');
+    history?.push('/dash');
+    navigate('/dash');
   };
 
   const updateWithAnswerer = async (id, name) => {
@@ -90,6 +93,11 @@ function Quiz({ history }) {
         }}
       >
         <QuestionSection>
+          <GOBackButton
+            onClickFunc={() => {
+              logout();
+            }}
+          />
           {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>
@@ -101,7 +109,23 @@ function Quiz({ history }) {
               </CurrentQuestion>
               {!match?.currentAnswerer || match?.currentAnswerer === null ? (
                 <>
-                  <span>- Escolha o grupo que poderá responder à pergunta</span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                    }}
+                  >
+                    Escolha o grupo que poderá responder à pergunta{' '}
+                    <StyledButton>
+                      <AiOutlineQuestionCircle id="my-anchor-element" />
+                    </StyledButton>
+                  </span>{' '}
+                  <Tooltip
+                    anchorId="my-anchor-element"
+                    content="Realize uma dinâmica, como par ou ímpar, para escolher o primeiro grupo a responder à pergunta"
+                    place="top"
+                  />
                   {match?.groups.map((group) => (
                     <Button
                       style={{ marginTop: '1vh' }}
@@ -121,13 +145,6 @@ function Quiz({ history }) {
           ) : (
             <img style={{ width: '30vw', minWidth: 200 }} src={Thanks} alt="" />
           )}{' '}
-          <Button
-            style={{ width: '40%', alignSelf: 'flex-end', marginTop: 20 }}
-            onClick={() => {
-              logout();
-            }}
-            child="Sair"
-          />
         </QuestionSection>{' '}
         <div className="divider" />
         <GroupPoints match={match} />
@@ -149,6 +166,26 @@ const CurrentQuestion = styled.div`
   margin-bottom: 12px;
   font-weight: bold;
   font-size: 2.5vh;
+  max-width: 300px;
+  display: block;
+`;
+
+const StyledButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: var(--white);
+  background-color: var(--dark-green);
+  border-radius: 30px;
+  padding: 2px;
+  border: 2px solid var(--dark-green);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 export default Quiz;

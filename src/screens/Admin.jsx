@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, signInWithGoogle } from '../firebase';
-import { MainWindow } from '../components/MainWindow';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import { MainWindow } from '../components/MainWindow';
+import { auth, signInWithGoogle } from '../firebase';
 
 function Login() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
   useEffect(() => {
-    if (loading) {
-      return;
-    }
+    signInWithGoogle();
+
     if (user) navigate('/dash');
   }, [user, loading]);
 
