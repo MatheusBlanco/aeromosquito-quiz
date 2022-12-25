@@ -253,27 +253,29 @@ function GroupAnswering({ history }) {
             </div>
           </div>
         ) : (
-          <div>
-            <QuestionSection>
-              <StyledHeader>Resultados: </StyledHeader>
-              <AnswerSection>{endMessage()}</AnswerSection>
-              <Button
-                style={{ marginTop: 20 }}
-                onClick={() => leaveMatch()}
-                child="Voltar"
-              />
-            </QuestionSection>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignContent: 'flex-start',
+              gap: '20px',
+            }}
+          >
+            <StyledHeader>Resultados: </StyledHeader>
+            <AnswerSection>{endMessage()}</AnswerSection>
+            <GroupPoints match={match} noMatchInfo />
+
+            <Button
+              style={{ marginTop: 20 }}
+              onClick={() => leaveMatch()}
+              child="Voltar"
+            />
           </div>
         )}
       </div>
     </MainWindow>
   );
 }
-
-const QuestionSection = styled.div`
-  width: 100%;
-  position: relative;
-`;
 
 const AnswerSection = styled.div`
   width: 100%;
