@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
 export const StyledHeader = styled.span`
-  font-size: 28px;
+  font-size: 20px;
   font-weight: bold;
 `;

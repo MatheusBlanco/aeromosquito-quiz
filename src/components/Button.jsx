@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import styled from 'styled-components';
 import { Oval } from 'react-loader-spinner';
+import styled from 'styled-components';
 
 export default function Button({
   loading,
@@ -40,6 +40,7 @@ const StyledButton = styled.button`
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-width: 150px;
   font-size: 16px;
   color: var(--white);
   background-color: var(--dark-green);

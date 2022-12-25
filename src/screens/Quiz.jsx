@@ -2,30 +2,33 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect } from 'react';
-import '../App.css';
 import {
   collection,
-  query,
-  onSnapshot,
-  where,
   doc,
-  updateDoc,
   getDocs,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase';
+import styled from 'styled-components';
+import '../App.css';
+import Thanks from '../assets/images/Obrigado.jpg';
 import Button from '../components/Button';
+import GroupPoints from '../components/GroupPoints';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
-import Thanks from '../assets/images/Obrigado.jpg';
+import { db } from '../firebase';
+import useWindowDimensions from '../hooks/useWindowsDimensions';
 
 function Quiz({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [match, setMatch] = useState(null);
   const navigate = useNavigate();
+  const { width } = useWindowDimensions();
 
   const handleMatchInfo = async () => {
     const m = query(
@@ -78,22 +81,19 @@ function Quiz({ history }) {
 
   return (
     <MainWindow>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <StyledHeader>{match?.cod}</StyledHeader>
-        <ul>
-          {match?.groups.map((group) => (
-            <li key={group?.groupId}>
-              <span style={{ fontSize: 20, fontWeight: 'bold' }}>
-                {group?.groupName} - {group?.score} pontos
-              </span>
-            </li>
-          ))}
-        </ul>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: width <= 500 ? 'column-reverse' : 'row',
+          alignContent: 'flex-start',
+          gap: '20px',
+        }}
+      >
         <QuestionSection>
           {currentQuestion <= questions?.length ? (
             <>
               <QuestionCount>
-                <StyledHeader>Question {currentQuestion}</StyledHeader>/
+                <StyledHeader>Questão {currentQuestion}</StyledHeader>/
                 {questions?.length}
               </QuestionCount>
               <CurrentQuestion>
@@ -120,15 +120,17 @@ function Quiz({ history }) {
             </>
           ) : (
             <img style={{ width: '30vw', minWidth: 200 }} src={Thanks} alt="" />
-          )}
-        </QuestionSection>
-        <Button
-          style={{ minWidth: '10%', alignSelf: 'center', marginTop: 20 }}
-          onClick={() => {
-            logout();
-          }}
-          child="Sair"
-        />
+          )}{' '}
+          <Button
+            style={{ width: '40%', alignSelf: 'flex-end', marginTop: 20 }}
+            onClick={() => {
+              logout();
+            }}
+            child="Sair"
+          />
+        </QuestionSection>{' '}
+        <div className="divider" />
+        <GroupPoints match={match} />
       </div>
     </MainWindow>
   );

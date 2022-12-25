@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "16.15.1",
-    "npm": "8.11.0"
+    "node": "16.18.1",
+    "npm": "8.19.2"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
     "create-app-react": "^1.0.6",
+    "dotenv": "^16.0.3",
     "firebase": "^9.9.1",
     "firebaseui": "^6.0.1",
     "history": "^5.0.0",

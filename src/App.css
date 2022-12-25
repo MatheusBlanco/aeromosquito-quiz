@@ -54,3 +54,11 @@ button:hover {
 button:focus {
   outline: none;
 }
+
+.divider {
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  border-left: 2px solid white;
+  border-radius: 5px;
+}

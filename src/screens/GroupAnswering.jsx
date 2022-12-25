@@ -1,31 +1,31 @@
-/* eslint-disable consistent-return */
-/* eslint-disable array-callback-return */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
-import React, { useState, useEffect } from 'react';
-import '../App.css';
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-nested-ternary */
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
-  query,
-  arrayUnion,
-  arrayRemove,
-  onSnapshot,
   getDocs,
-  where,
+  onSnapshot,
+  query,
   updateDoc,
+  where,
 } from 'firebase/firestore';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase';
+import styled from 'styled-components';
+import '../App.css';
+import Correct from '../assets/images/Acerto.jpg';
+import Tied from '../assets/images/Empate.jpg';
+import Wrong from '../assets/images/Erro.jpg';
 import Button from '../components/Button';
+import GroupPoints from '../components/GroupPoints';
 import { MainWindow } from '../components/MainWindow';
 import { StyledHeader } from '../components/Texts';
-import Correct from '../assets/images/Acerto.jpg';
-import Wrong from '../assets/images/Erro.jpg';
-import Tied from '../assets/images/Empate.jpg';
+import { db } from '../firebase';
+import useWindowDimensions from '../hooks/useWindowsDimensions';
 
 function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
@@ -34,6 +34,8 @@ function GroupAnswering({ history }) {
   const [message, setMessage] = useState(null);
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { width } = useWindowDimensions();
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem('group');
@@ -187,18 +189,26 @@ function GroupAnswering({ history }) {
   return (
     <MainWindow>
       <div>
-        <QuestionSection>
-          {currentQuestion <= questions.length ? (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <QuestionCount>
-                <StyledHeader>
-                  {match?.groups?.find((g) => g?.groupId === token)?.groupName}
-                </StyledHeader>
-                <br />
-                <StyledHeader>
-                  Question {currentQuestion}/{questions.length}
-                </StyledHeader>
-              </QuestionCount>
+        {currentQuestion <= questions.length ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: width <= 500 ? 'column-reverse' : 'row',
+              alignContent: 'flex-start',
+              gap: '20px',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignContent: 'flex-start',
+                gap: '20px',
+              }}
+            >
+              <StyledHeader>
+                Questão {currentQuestion}/{questions.length}
+              </StyledHeader>
               {match?.currentAnswerer?.id === token && !message ? (
                 <AnswerSection>
                   {!message ? (
@@ -232,23 +242,30 @@ function GroupAnswering({ history }) {
               ) : (
                 <p>{answerMessage()}</p>
               )}
-            </div>
-          ) : (
+            </div>{' '}
+            <div className="divider" />
             <div>
-              <QuestionSection>
-                <StyledHeader>Resultados: </StyledHeader>
-                <AnswerSection>{endMessage()}</AnswerSection>
-                <Button
-                  style={{ marginTop: 20 }}
-                  onClick={() => leaveMatch()}
-                  child="Voltar"
-                />
-              </QuestionSection>
+              <StyledHeader>
+                Grupo{' '}
+                {match?.groups?.find((g) => g?.groupId === token)?.groupName}
+              </StyledHeader>
+              <GroupPoints match={match} />
             </div>
-          )}
-        </QuestionSection>
+          </div>
+        ) : (
+          <div>
+            <QuestionSection>
+              <StyledHeader>Resultados: </StyledHeader>
+              <AnswerSection>{endMessage()}</AnswerSection>
+              <Button
+                style={{ marginTop: 20 }}
+                onClick={() => leaveMatch()}
+                child="Voltar"
+              />
+            </QuestionSection>
+          </div>
+        )}
       </div>
-      {/* ) : null} */}
     </MainWindow>
   );
 }
@@ -256,12 +273,6 @@ function GroupAnswering({ history }) {
 const QuestionSection = styled.div`
   width: 100%;
   position: relative;
-`;
-
-const QuestionCount = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
 `;
 
 const AnswerSection = styled.div`
