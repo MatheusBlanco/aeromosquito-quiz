@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
 /* eslint-disable react/no-array-index-key */
@@ -13,7 +14,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import '../App.css';
@@ -28,6 +29,33 @@ import { StyledHeader } from '../components/Texts';
 import { db } from '../firebase';
 import useWindowDimensions from '../hooks/useWindowsDimensions';
 
+const STATUS = {
+  STARTED: 'Started',
+  STOPPED: 'Stopped',
+};
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      // @ts-ignore
+      savedCallback?.current();
+    }
+    if (delay !== null) {
+      const id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+const twoDigits = (num) => String(num).padStart(2, '0');
+
 function GroupAnswering({ history }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -37,9 +65,32 @@ function GroupAnswering({ history }) {
   const [loading, setLoading] = useState(false);
   const { width } = useWindowDimensions();
 
+  const [secondsRemaining, setSecondsRemaining] = useState(900);
+  const [status, setStatus] = useState(STATUS.STOPPED);
+  const token = localStorage.getItem('group');
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('group');
+  const secondsToDisplay = secondsRemaining % 60;
+  const minutesRemaining = (secondsRemaining - secondsToDisplay) / 60;
+  const minutesToDisplay = minutesRemaining % 60;
+
+  const handleStart = () => {
+    setStatus(STATUS.STARTED);
+  };
+
+  useEffect(() => {
+    if (
+      match?.currentAnswerer?.id === token &&
+      !message &&
+      match?.timeout !== null
+    ) {
+      handleStart();
+    }
+  }, [match?.timeout, match?.currentAnswerer?.id]);
+
+  useEffect(() => {
+    setSecondsRemaining(match?.timeout);
+  }, [match?.timeout, match?.currentAnswerer?.id]);
 
   const leaveMatch = () => {
     localStorage.removeItem('group');
@@ -147,9 +198,11 @@ function GroupAnswering({ history }) {
 
           await updateDoc(documentRef, 'currentQuestion', matchCurrentQuestion);
           await updateDoc(documentRef, 'currentAnswerer', null);
+          setStatus(STATUS.STOPPED);
+
           setTimeout(() => {
             setMessage(null);
-          }, 5000);
+          }, 3000);
         }
       });
     });
@@ -187,6 +240,17 @@ function GroupAnswering({ history }) {
     return <img style={{ width: '30vw', minWidth: 200 }} src={Wrong} alt="" />;
   };
 
+  useInterval(
+    () => {
+      if (secondsRemaining > 0) {
+        setSecondsRemaining(secondsRemaining - 1);
+      } else {
+        handleAnswerOptionClick(false);
+      }
+    },
+    status === STATUS.STARTED ? 1000 : null
+  );
+
   return (
     <div>
       <MainWindow>
@@ -212,9 +276,29 @@ function GroupAnswering({ history }) {
                 <StyledHeader>
                   Questão {currentQuestion}/{questions.length}
                 </StyledHeader>
-                <CurrentQuestion>
+                {match?.currentAnswerer?.id === token &&
+                  !message &&
+                  match?.timeout && (
+                    <div>
+                      <CurrentQuestion>Tempo restante</CurrentQuestion>
+                      <div
+                        style={{
+                          fontSize: '30px',
+                          background: 'var(--dark-green)',
+                          padding: 10,
+                          width: '100%',
+                          borderRadius: 10,
+                          maxWidth: 150,
+                        }}
+                      >
+                        {twoDigits(minutesToDisplay)}:
+                        {twoDigits(secondsToDisplay)}{' '}
+                      </div>
+                    </div>
+                  )}
+                <StyledHeader>
                   {questions[currentQuestion - 1]?.questionText}
-                </CurrentQuestion>
+                </StyledHeader>
                 {match?.currentAnswerer?.id === token && !message ? (
                   <AnswerSection>
                     {!message ? (
@@ -242,9 +326,9 @@ function GroupAnswering({ history }) {
                     )}
                   </AnswerSection>
                 ) : !message ? (
-                  <StyledHeader>
+                  <CurrentQuestion>
                     Espere o resultado da escolha de grupos
-                  </StyledHeader>
+                  </CurrentQuestion>
                 ) : (
                   <p>{answerMessage()}</p>
                 )}

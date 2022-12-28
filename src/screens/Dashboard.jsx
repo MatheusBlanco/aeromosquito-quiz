@@ -1,18 +1,10 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
-import {
-  addDoc,
-  collection,
-  getDocs,
-  onSnapshot,
-  query,
-} from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import Button from '../components/Button';
 import { MainWindow } from '../components/MainWindow';
@@ -20,47 +12,17 @@ import TextInput from '../components/TextInput';
 import { StyledHeader } from '../components/Texts';
 import { auth, db, logout } from '../firebase';
 
-function CreateMatch({ history }) {
+function Dashboard({ history }) {
   const [matches, setmatches] = useState();
   const [matchCode, setMatchCode] = useState('');
   const [matchCodeError, setMatchCodeError] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [connectLoad, setConnectLoad] = useState(false);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
-  const generateArray = (questionLength) =>
-    [...new Array(10)].map(() => Math.round(Math.random() * questionLength));
-
   const createMatch = async () => {
-    setLoading(true);
-    const questions = await query(collection(db, 'questions'));
-    const querySnapshot = await getDocs(questions);
-    const questionLength = querySnapshot.size;
-
-    const questionsArray = generateArray(questionLength);
-
-    const matchCodeId = uuidv4().substring(0, 6).toUpperCase();
-    const match = collection(db, 'match');
-    await addDoc(match, {
-      id: uuidv4(),
-      cod: matchCodeId,
-      groups: [],
-      currentQuestion: 1,
-      questionLength: questionsArray.length,
-      questionsArray,
-      currentAnswerer: null,
-    })
-      .then(() => {
-        history?.push(`/quiz/${matchCodeId}`);
-        navigate(`/quiz/${matchCodeId}`);
-      })
-      .catch(() =>
-        toast.error(
-          'Houve um erro no sistema ao tentar criar a partida, tente novamente mais tarde'
-        )
-      );
-    setLoading(false);
+    history?.push('/matchParams');
+    navigate(`/matchParams`);
   };
 
   const handleLogout = () => {
@@ -112,6 +74,8 @@ function CreateMatch({ history }) {
           value={matchCode}
           onTextChange={(value) => setMatchCode(value)}
           wrongData={matchCodeError}
+          tooltip
+          tooltipMessage="O código deve conter 6 caractéres"
           wrongDataMessage={
             matchCodeError ? 'Código inexistente. Insira um código válido' : ''
           }
@@ -122,7 +86,7 @@ function CreateMatch({ history }) {
             onClick={() => connectToExistingMatch(matchCode)}
             child="Conectar com partida"
             loading={connectLoad}
-            style={{ backgroundColor: 'var(--secondary-green)', border: '0px' }}
+            style={{ backgroundColor: 'var(--secondary-green)' }}
           />
         ) : null}
 
@@ -137,7 +101,6 @@ function CreateMatch({ history }) {
           onClick={() => {
             createMatch();
           }}
-          loading={loading}
           style={{ height: '80px', fontSize: '30px' }}
           child="Criar partida"
         />
@@ -152,10 +115,10 @@ function CreateMatch({ history }) {
     </MainWindow>
   );
 }
-const StyledButton = styled(Button)`
+export const StyledButton = styled(Button)`
   margin-top: 20px;
   width: 100%;
   align-self: center;
 `;
 
-export default CreateMatch;
+export default Dashboard;

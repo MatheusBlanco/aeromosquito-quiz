@@ -1,12 +1,13 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import LogAsGroup from '../screens/LogAsGroup';
-import Quiz from '../screens/Quiz';
-import CreateMatch from '../screens/CreateMatch';
+import Admin from '../screens/Admin';
+import Dashboard from '../screens/Dashboard';
 import GroupAnswering from '../screens/GroupAnswering';
 import Home from '../screens/Home';
-import Admin from '../screens/Admin';
+import LogAsGroup from '../screens/LogAsGroup';
+import MatchParams from '../screens/MatchParams';
 import NewQuestions from '../screens/NewQuestions';
+import Quiz from '../screens/Quiz';
 
 function Router() {
   return (
@@ -16,7 +17,8 @@ function Router() {
       <Route path="/quiz/group" element={<LogAsGroup />} />
       <Route path="/quiz/:match" element={<Quiz />} />
       <Route exact path="quiz/group/:match" element={<GroupAnswering />} />
-      <Route path="/dash" element={<CreateMatch />} />
+      <Route path="/dash" element={<Dashboard />} />
+      <Route path="/matchParams" element={<MatchParams />} />
       <Route path="/newQuestions" element={<NewQuestions />} />
     </Routes>
   );
