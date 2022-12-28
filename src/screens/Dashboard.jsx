@@ -65,7 +65,11 @@ function Dashboard({ history }) {
   };
 
   return (
-    <MainWindow>
+    <MainWindow
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
+    >
       <div style={{ display: 'flex', flexDirection: 'column', padding: 15 }}>
         <StyledHeader>Painel de gerenciamento de organizador</StyledHeader>
         <br />

@@ -116,6 +116,9 @@ function LogAsGroup({ history }) {
 
   return (
     <MainWindow
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
       style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
     >
       <StyledHeader>Iniciar jogo</StyledHeader>

@@ -29,7 +29,12 @@ function Home({ history }) {
   }, [user]);
 
   return (
-    <MainWindow style={{ display: 'flex', flexDirection: 'column' }}>
+    <MainWindow
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       <StyledHeader>Bem vindo!</StyledHeader>
       <h3>Por favor, escolha sua forma de participação</h3>
       <div

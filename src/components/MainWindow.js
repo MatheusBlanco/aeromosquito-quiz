@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const MainWindow = styled.div`
-  background-color: var(--primary-green);
+  background-color: var(--primary-${({ color }) => color});
   border-radius: 15px;
   padding: 20px;
   width: calc(device-width/2);
@@ -22,11 +22,11 @@ export const MainWindow = styled.div`
   ::-webkit-scrollbar-track {
     border-radius: 10px;
     width: 4px;
-    background: var(--secondary-green);
+    background: var(--secondary-${({ color }) => color});
   }
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: var(--dark-green);
+    background: var(--dark-${({ color }) => color});
     width: 6px;
     border-radius: 10px;
   }

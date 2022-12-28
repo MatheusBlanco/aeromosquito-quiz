@@ -14,6 +14,9 @@ export default function Button({
     <StyledButton
       {...props}
       type="button"
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
       disabled={loading ? true : disabled}
       onClick={loading ? () => {} : onClick}
     >
@@ -43,14 +46,19 @@ const StyledButton = styled.button`
   min-width: 150px;
   font-size: 16px;
   color: var(--white);
-  background-color: var(--dark-green);
+  background-color: var(--dark-${({ color }) => color});
   border-radius: 5px;
   padding: 5px;
-  border: 2px solid var(--dark-green);
+  border: 2px solid var(--dark-${({ color }) => color});
   cursor: pointer;
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  &:hover {
+    background-color: var(--secondary-${({ color }) => color});
+    border: 2px solid var(--secondary-${({ color }) => color});
   }
 `;

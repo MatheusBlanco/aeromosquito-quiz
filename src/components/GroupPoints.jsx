@@ -65,7 +65,7 @@ export default function GroupPoints({ match, noMatchInfo }) {
                 {handleMedalRender()}
               </div>
               <ProgressBar
-                bgcolor="var(--dark-green)"
+                bgcolor={`var(--dark-${localStorage.getItem('color')})`}
                 completed={groupPointsPercentage}
               />
             </div>

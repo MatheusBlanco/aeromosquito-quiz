@@ -15,7 +15,11 @@ function Login() {
   }, [user, loading]);
 
   return (
-    <MainWindow>
+    <MainWindow
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
+    >
       <div>
         <Button
           type="button"

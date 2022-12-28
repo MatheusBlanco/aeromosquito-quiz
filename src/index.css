@@ -20,6 +20,18 @@ code {
   --secondary-green: #5d7740;
 
   --primary-yellow: #dedc00;
+  --dark-yellow: #d98324;
+  --secondary-yellow: #fffc5c;
 
+  --primary-red: #ff0a23;
   --dark-red: #8b0000;
+  --secondary-red: #ff3347;
+
+  --primary-blue: #1643a2;
+  --dark-blue: #0e0052;
+  --secondary-blue: #3badba;
+
+  --primary-pink: #d24787;
+  --dark-pink: #7f3667;
+  --secondary-pink: #ffdde1;
 }

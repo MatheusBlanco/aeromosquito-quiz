@@ -59,6 +59,10 @@ function Quiz({ history }) {
     });
   };
 
+  useEffect(() => {
+    if (match?.customColor) localStorage.setItem('color', match?.customColor);
+  }, [match?.customColor]);
+
   const logout = () => {
     history?.push('/dash');
     navigate('/dash');
@@ -82,8 +86,14 @@ function Quiz({ history }) {
     handleMatchInfo();
   }, []);
 
+  console.log(match);
+
   return (
-    <MainWindow>
+    <MainWindow
+      color={
+        localStorage.getItem('color') ? localStorage.getItem('color') : 'green'
+      }
+    >
       <div
         style={{
           display: 'flex',
@@ -117,7 +127,7 @@ function Quiz({ history }) {
                     }}
                   >
                     Escolha o grupo que poderá responder à pergunta{' '}
-                    <StyledButton>
+                    <StyledButton color={localStorage.getItem('color')}>
                       <AiOutlineQuestionCircle id="my-anchor-element" />
                     </StyledButton>
                   </span>{' '}
@@ -176,10 +186,10 @@ const StyledButton = styled.button`
   align-items: center;
   font-size: 16px;
   color: var(--white);
-  background-color: var(--dark-green);
+  background-color: var(--dark-${({ color }) => color});
   border-radius: 30px;
   padding: 2px;
-  border: 2px solid var(--dark-green);
+  border: 2px solid var(--dark-${({ color }) => color});
   cursor: pointer;
 
   &:disabled {

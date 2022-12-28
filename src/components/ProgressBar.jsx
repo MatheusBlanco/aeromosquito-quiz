@@ -5,7 +5,7 @@ function ProgressBar({ bgcolor, completed }) {
     height: 20,
     minWidth: '200px',
     width: '100%',
-    backgroundColor: 'var(--secondary-green)',
+    backgroundColor: `var(--secondary-${localStorage.getItem('color')})`,
     borderRadius: 5,
   };
 

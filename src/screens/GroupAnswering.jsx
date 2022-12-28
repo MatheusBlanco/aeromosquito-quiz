@@ -122,6 +122,10 @@ function GroupAnswering({ history }) {
     handleMatchInfo();
   }, []);
 
+  useEffect(() => {
+    if (match?.customColor) localStorage.setItem('color', match?.customColor);
+  }, [match?.customColor]);
+
   const updateDocuments = async (document, correct) => {
     const documentRef = doc(db, 'match', document.id);
     const currentgroup = document
@@ -253,7 +257,13 @@ function GroupAnswering({ history }) {
 
   return (
     <div>
-      <MainWindow>
+      <MainWindow
+        color={
+          localStorage.getItem('color')
+            ? localStorage.getItem('color')
+            : 'green'
+        }
+      >
         <div>
           {currentQuestion <= questions.length ? (
             <div
@@ -284,7 +294,9 @@ function GroupAnswering({ history }) {
                       <div
                         style={{
                           fontSize: '30px',
-                          background: 'var(--dark-green)',
+                          background: `var(--dark-${localStorage.getItem(
+                            'color'
+                          )})`,
                           padding: 10,
                           width: '100%',
                           borderRadius: 10,
