@@ -86,8 +86,6 @@ function Quiz({ history }) {
     handleMatchInfo();
   }, []);
 
-  console.log(match);
-
   return (
     <MainWindow
       color={
