@@ -101,20 +101,31 @@ function Dashboard({ history }) {
             style={{ backgroundColor: 'var(--secondary-green)' }}
           />
         ) : null}
-        <StyledButton
-          onClick={() => {
-            createMatch();
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            align: 'center',
+            gap: '20px',
           }}
-          style={{ height: '80px', fontSize: '30px' }}
-          child="Criar partida"
-        />
-        <StyledButton
-          onClick={() => {
-            handleLogout();
-          }}
-          child="Desconectar"
-          style={{ backgroundColor: 'var(--dark-red)', border: '0px' }}
-        />
+        >
+          <StyledButton
+            onClick={() => {
+              handleLogout();
+            }}
+            child="Desconectar"
+            style={{
+              backgroundColor: 'var(--dark-red)',
+              border: '2px solid var(--dark-red)',
+            }}
+          />
+          <StyledButton
+            onClick={() => {
+              createMatch();
+            }}
+            child="Criar partida"
+          />
+        </div>
       </div>
     </MainWindow>
   );

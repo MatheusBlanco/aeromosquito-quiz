@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../components/Button';
+import { GOBackButton } from '../components/GoBackButton';
 import { MainWindow } from '../components/MainWindow';
 import TextInput from '../components/TextInput';
 import { StyledHeader } from '../components/Texts';
@@ -121,6 +122,8 @@ function LogAsGroup({ history }) {
       }
       style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
     >
+      <GOBackButton onClickFunc={() => handleLogout()} />
+
       <StyledHeader>Iniciar jogo</StyledHeader>
       <TextInput
         label="Nome do Grupo"
@@ -141,20 +144,21 @@ function LogAsGroup({ history }) {
         tooltip
         tooltipMessage="O código deve conter 6 caractéres"
       />
-      <Button
-        style={{ marginTop: 20 }}
-        onClick={() => handleLogAsGroup(groupName, matchCode)}
-        child="Conectar a uma partida existente"
-        loading={loading}
-        disabled={groupName.length < 6 || matchCode.length < 6}
-      />
-      <Button
-        onClick={() => {
-          handleLogout();
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          align: 'center',
+          gap: '20px',
         }}
-        child="Voltar"
-        style={{ backgroundColor: 'var(--dark-red)', border: '0px' }}
-      />
+      >
+        <Button
+          onClick={() => handleLogAsGroup(groupName, matchCode)}
+          child="Conectar a uma partida existente"
+          loading={loading}
+          disabled={groupName.length < 6 || matchCode.length < 6}
+        />
+      </div>
     </MainWindow>
   );
 }
