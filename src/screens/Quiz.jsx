@@ -41,6 +41,7 @@ function Quiz({ history }) {
     );
     onSnapshot(m, async (querySnapshot) => {
       setMatch(querySnapshot.docs.map((d) => d.data())[0]);
+
       const q = await query(
         collection(db, 'questions'),
         where(
@@ -125,7 +126,13 @@ function Quiz({ history }) {
                     }}
                   >
                     Escolha o grupo que poderá responder à pergunta{' '}
-                    <StyledButton color={localStorage.getItem('color')}>
+                    <StyledButton
+                      color={
+                        localStorage.getItem('color')
+                          ? localStorage.getItem('color')
+                          : 'green'
+                      }
+                    >
                       <AiOutlineQuestionCircle id="my-anchor-element" />
                     </StyledButton>
                   </span>{' '}
@@ -136,6 +143,7 @@ function Quiz({ history }) {
                   />
                   {match?.groups.map((group) => (
                     <Button
+                      key={group.groupId}
                       style={{ marginTop: '1vh' }}
                       onClick={() =>
                         updateWithAnswerer(group.groupId, group.groupName)

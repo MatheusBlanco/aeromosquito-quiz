@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
-import { MdClose } from 'react-icons/md';
+import { GOBackButton } from './GoBackButton';
 
 const Modal = ({ show, onClose, onGoBack, title, children }) =>
   ReactDOM.createPortal(
@@ -11,9 +11,7 @@ const Modal = ({ show, onClose, onGoBack, title, children }) =>
       <StyledModal onClick={onClose}>
         <StyledContent onClick={(e) => e.stopPropagation()}>
           <StyledHeader>
-            <StyledGoBack onClick={onGoBack} type="button">
-              <MdClose />
-            </StyledGoBack>
+            <GOBackButton onClickFunc={onGoBack} type="button" />
           </StyledHeader>
           <HeaderContents>{title}</HeaderContents>
           <StyledBody>{children}</StyledBody>

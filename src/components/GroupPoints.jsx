@@ -11,10 +11,16 @@ export default function GroupPoints({ match, noMatchInfo }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {' '}
       {!noMatchInfo && (
-        <StyledHeader style={{ fontSize: '14px' }}>
-          Partida {match?.cod}
-        </StyledHeader>
-      )}
+        <>
+          <StyledHeader style={{ fontSize: '14px' }}>
+            Partida: {match?.cod}
+          </StyledHeader>
+          <StyledHeader style={{ fontSize: '14px' }}>
+            Tema: {match?.theme}
+          </StyledHeader>
+        </>
+      )}{' '}
+      <span style={{ fontSize: 20, fontWeight: 'bold' }}>Pontuação:</span>
       {match?.groups
         .sort((a, b) => b.score - a.score)
         .map((group) => {
@@ -60,12 +66,16 @@ export default function GroupPoints({ match, noMatchInfo }) {
                 }}
               >
                 <span style={{ fontSize: 20, fontWeight: 'bold' }}>
-                  Pontos time {group?.groupName}
+                  {group?.groupName}
                 </span>
                 {handleMedalRender()}
               </div>
               <ProgressBar
-                bgcolor={`var(--dark-${localStorage.getItem('color')})`}
+                bgcolor={
+                  localStorage.getItem('color')
+                    ? `var(--dark-${localStorage.getItem('color')})`
+                    : `var(--dark-green)`
+                }
                 completed={groupPointsPercentage}
               />
             </div>

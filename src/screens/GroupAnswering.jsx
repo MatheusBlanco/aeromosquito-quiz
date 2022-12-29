@@ -294,9 +294,9 @@ function GroupAnswering({ history }) {
                       <div
                         style={{
                           fontSize: '30px',
-                          background: `var(--dark-${localStorage.getItem(
-                            'color'
-                          )})`,
+                          background: localStorage.getItem('color')
+                            ? `var(--dark-${localStorage.getItem('color')})`
+                            : `var(--dark-green)`,
                           padding: 10,
                           width: '100%',
                           borderRadius: 10,

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -11,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../components/Button';
@@ -26,8 +28,9 @@ function NewQuestions() {
   const [modal, setModal] = useState(false);
   const [user] = useAuthState(auth);
   const [newQuestion, setNewQuestion] = useState('');
-  const [modalState, setModalState] = useState('question');
+  const [modalState, setModalState] = useState('theme');
   const [newQuestionList, setNewQuestionList] = useState([]);
+  const [newQuestionTheme, setNewQuestionTheme] = useState('');
   const [alternative1, setAlternative1] = useState('');
   const [alternative2, setAlternative2] = useState('');
   const [alternative3, setAlternative3] = useState('');
@@ -35,12 +38,26 @@ function NewQuestions() {
   const [alternatives, setAlternatives] = useState([]);
   const [correctAlternative, setCorrectAlternative] = useState();
   const [loading, setLoading] = useState(false);
+  const [themes, setThemes] = useState([]);
+  const [newTheme, setNewTheme] = useState(false);
+
   const navigate = useNavigate();
 
   const handleExistingQuestions = async () => {
     const q = query(collection(db, 'questions'));
 
     onSnapshot(q, (querySnapshot) => {
+      const questions = querySnapshot.docs.map((quest) => quest.data());
+      const groupedMap = questions.reduce(
+        (entryMap, e) =>
+          entryMap.set(e.theme, [...(entryMap.get(e.theme) || []), e]),
+        new Map()
+      );
+      const themesArray = [];
+      for (const [key] of groupedMap) {
+        themesArray.push({ answer: key, id: key });
+      }
+      setThemes(themesArray);
       setExistingQuestions(querySnapshot.docs.map((d) => d.data()));
     });
   };
@@ -52,6 +69,7 @@ function NewQuestions() {
 
   const handleClose = () => {
     setModal(false);
+    setModalState('theme');
   };
 
   const handleAlternativesArray = (one, two, three, four) => {
@@ -67,6 +85,7 @@ function NewQuestions() {
   const handleAddToArray = () => {
     const completeQuestion = {
       questionText: newQuestion,
+      theme: newQuestionTheme,
       answerOptions: [
         {
           answerText: alternatives[0].answer,
@@ -113,15 +132,66 @@ function NewQuestions() {
         id: index + questionLength + 1,
         questionText: entry.questionText,
         answerOptions: entry.answerOptions,
-      });
+        theme: entry.theme,
+      }).catch(() =>
+        toast.error(
+          'Ocorreu um erro na criação da pergunta, tente novamente mais tarde'
+        )
+      );
     });
+    toast('Perguntas adicionadas com sucesso');
+    handleExistingQuestions();
     setModal(false);
+    setModalState('theme');
     setLoading(false);
     setNewQuestionList([]);
   };
 
   const modalContent = () => {
     switch (modalState) {
+      case 'theme':
+        return (
+          <StyledCreation>
+            {' '}
+            <p>Escolha ou crie um tema para suas perguntas</p>
+            <Button
+              style={{ marginBottom: 20 }}
+              onClick={() => setNewTheme(!newTheme)}
+              child={newTheme ? 'Selecionar tema' : 'Criar novo tema'}
+            />
+            {!newTheme && (
+              <Select
+                options={themes}
+                complex
+                onOptionClick={(option) => setNewQuestionTheme(option)}
+                selectedOption
+                defaultPlaceholder="Temas"
+                selectstyle
+                width
+              />
+            )}
+            {newTheme && (
+              <>
+                <span style={{ wordWrap: 'break-word', maxWidth: 300 }}>
+                  Este tema só será liberado para utilização quando existirem 10
+                  perguntas relacionadas ao mesmo!
+                </span>
+
+                <TextInput
+                  placeholder="Novo tema"
+                  value={newQuestionTheme}
+                  onTextChange={(value) => setNewQuestionTheme(value)}
+                />
+              </>
+            )}
+            <Button
+              style={{ marginTop: 20 }}
+              onClick={() => setModalState('question')}
+              child="Continuar"
+              disabled={newQuestionTheme === ''}
+            />
+          </StyledCreation>
+        );
       case 'question':
         return (
           <StyledCreation>
@@ -130,13 +200,13 @@ function NewQuestions() {
               value={newQuestion}
               onTextChange={(value) => setNewQuestion(value)}
             />
-            {newQuestion.length > 10 ? (
-              <Button
-                style={{ marginTop: 20 }}
-                onClick={() => setModalState('alternatives')}
-                child="Continuar"
-              />
-            ) : null}
+
+            <Button
+              style={{ marginTop: 20 }}
+              onClick={() => setModalState('alternatives')}
+              child="Continuar"
+              disabled={newQuestion.length < 10}
+            />
           </StyledCreation>
         );
       case 'alternatives':
@@ -230,18 +300,22 @@ function NewQuestions() {
         }
       >
         <div style={{ padding: 20 }}>
-          <StyledHeader>Perguntas existentes na aplicação</StyledHeader>
-          <ul>
-            {existingQuestions?.map((question) => (
-              <li>{question?.questionText}</li>
-            ))}
-          </ul>
           <Button
             onClick={() => {
               setModal(true);
             }}
             child="Criar novas perguntas"
           />
+          <StyledHeader>Perguntas existentes na aplicação</StyledHeader>
+          <ul>
+            {existingQuestions?.map((question) => (
+              <li>
+                Pergunta
+                <span style={{ fontWeight: 'bold' }}> {question?.theme}: </span>
+                {question?.questionText}
+              </li>
+            ))}
+          </ul>
         </div>
       </MainWindow>
       <Modal
@@ -263,6 +337,7 @@ function NewQuestions() {
                   <p style={{ fontWeight: 'bold' }}>
                     Pergunta: {nq.questionText}
                   </p>
+                  <p style={{ fontWeight: 'bold' }}>Tema: {nq.theme}</p>
                   <ul>
                     {nq.answerOptions.map((ao) => (
                       <li
