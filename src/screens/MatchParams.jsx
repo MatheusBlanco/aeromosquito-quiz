@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import toast from 'react-hot-toast';
 import Checkbox from '../components/CheckBox';
+import { GOBackButton } from '../components/GoBackButton';
 import { MainWindow } from '../components/MainWindow';
 import Select from '../components/Select';
 import TextInput from '../components/TextInput';
@@ -111,6 +112,7 @@ function MatchParams({ history }) {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', padding: 15 }}>
+        <GOBackButton onClickFunc={() => navigate('/dash')} type="button" />
         <StyledHeader>Defina os parâmetros para sua partida</StyledHeader>
         {!addTime && (
           <StyledButton

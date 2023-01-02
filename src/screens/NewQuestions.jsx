@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../components/Button';
+import { GOBackButton } from '../components/GoBackButton';
 import { MainWindow } from '../components/MainWindow';
 import Modal from '../components/Modal';
 import Select from '../components/Select';
@@ -300,12 +301,16 @@ function NewQuestions() {
         }
       >
         <div style={{ padding: 20 }}>
-          <Button
-            onClick={() => {
-              setModal(true);
-            }}
-            child="Criar novas perguntas"
-          />
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <GOBackButton onClickFunc={() => navigate('/dash')} type="button" />
+            <Button
+              onClick={() => {
+                setModal(true);
+              }}
+              style={{ width: '30%' }}
+              child="Criar novas perguntas"
+            />
+          </div>
           <StyledHeader>Perguntas existentes na aplicação</StyledHeader>
           <ul>
             {existingQuestions?.map((question) => (

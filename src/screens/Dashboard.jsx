@@ -26,10 +26,11 @@ function Dashboard({ history }) {
   };
 
   const handleLogout = () => {
+    logout();
     localStorage.removeItem('group');
     history?.push('/');
     navigate('/');
-    if (user) logout();
+    window.location.reload();
   };
 
   const handleMatches = async () => {
