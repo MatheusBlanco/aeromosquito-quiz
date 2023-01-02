@@ -75,22 +75,4 @@ const StyledBody = styled.div`
   }
 `;
 
-const StyledGoBack = styled.button`
-  border: none;
-  background-color: var(--dark-red);
-  width: 30px;
-  height: 30px;
-  border-radius: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  margin-bottom: 5px;
-  cursor: pointer;
-  z-index: 1;
-  &:hover {
-    background-color: var(--dark-red);
-  }
-`;
-
 export default Modal;
